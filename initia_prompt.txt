@@ -1,0 +1,22 @@
+Generate a React.js web application for an educational game that helps a 6-year-old English-speaking child learn Hebrew words. The game mechanics are as follows:
+
+1) The game consists of N steps (where N is configurable).
+2) At each step, the player is shown a Hebrew word along with four possible English translations.
+3) One translation is correct, while the other three are incorrect.
+4) One incorrect translation should be somewhat similar to the correct one (e.g., same root or related meaning).
+5) The other two should be completely wrong.
+6) The player must keep trying until they select the correct answer.
+7) Upon selecting the correct answer:
+  - A fun animation is played as a reward (e.g., confetti, stars, or a happy unicorn animation).
+  - A part of a hidden unicorn image (which is in the background) is revealed.
+8) Once the player finishes all N steps, the full unicorn image is revealed.
+9) The UI should be kid-friendly, colorful, and engaging.
+10) The game should be responsive and work on both desktop and tablet browsers.
+11) The app should be fully self-contained and run in the browser without a backend.
+12) Use React functional components with the useState and useEffect hooks.
+13) Use CSS animations or a lightweight animation library like Framer Motion for visual effects.
+14) The app should randomly generate words for each game session, selecting from a predefined list of common Hebrew words for children.
+15) Store progress in local state (optional: add localStorage support to track completed rounds).
+16) Include an easy restart option for a new game session.
+17) Avoid unnecessary libraries and dependencies unless needed for animations or UI enhancements.
+18) Return only the complete and well-structured React.js code with clean comments, ensuring it is easy to modify and extend.

@@ -17,6 +17,29 @@ const GameBoard = ({ totalSteps, onGameComplete }) => {
   const [showAnimation, setShowAnimation] = useState(false);
   const [currentAnimation, setCurrentAnimation] = useState(ANIMATIONS[0]);
   const [revealedParts, setRevealedParts] = useState(0);
+  const [backgroundImage, setBackgroundImage] = useState(null);
+
+  useEffect(() => {
+    if (currentStep === 0 && !backgroundImage) {
+      fetch(`https://source.unsplash.com/random/?rainbow,unicorn&${Date.now()}`)
+        .then(response => response.blob())
+        .then(blob => {
+          const img = new Image();
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            ctx.drawImage(img, 0, 0, window.innerWidth, window.innerHeight);
+            canvas.toBlob(blob => {
+              const localUrl = URL.createObjectURL(blob);
+              setBackgroundImage(localUrl);
+            });
+          };
+          img.src = URL.createObjectURL(blob);
+        });
+    }
+  }, [currentStep]);
 
   useEffect(() => {
     const shuffled = [...words].sort(() => Math.random() - 0.5);
@@ -59,22 +82,26 @@ const GameBoard = ({ totalSteps, onGameComplete }) => {
   if (!gameWords[currentStep]) return null;
 
   const AnimationIcon = currentAnimation.icon;
-  const revealPercentage = (revealedParts / totalSteps) * 100;
+  const revealPercentage = 100; // (revealedParts / totalSteps) * 100;
 
   return (
     <div className="relative w-full max-w-2xl mx-auto p-6">
       {/* Background container with gradient overlay */}
-      <div className="fixed inset-0 overflow-hidden">
-        {/* Unicorn image */}
-        <div 
+        <div className="fixed inset-0 overflow-hidden">
+            <div 
           className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-all duration-1000 ease-in-out"
           style={{
-            backgroundImage: "url('https://images.unsplash.com/photo-1513682121497-80211f36a7d3?auto=format&fit=crop&w=1600&q=80')",
+            transform: `scale(${Math.min(window.innerWidth / 800, window.innerHeight / 600)})`,
+            transformOrigin: 'center center',
+            //backgroundImage: `url('https://source.unsplash.com/random/?rainbow,unicorn&${Date.now()}')`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            //backgroundSize: `${window.innerWidth}px ${window.innerHeight}px`,
             clipPath: `inset(${100 - revealPercentage}% 0 0 0)`,
-            opacity: 0.3
+            opacity: 0.8
           }}
-        />
-        {/* Progress overlay */}
+            />
+            {/* Progress overlay */}
         <div 
           className="absolute inset-0 bg-gradient-to-b from-transparent to-pink-100/50"
           style={{

@@ -4,20 +4,15 @@ const N = 10; // Define maximum counter value
 const IMAGE_KEY = "rainbow_unicorn_image";
 
 export default function RainbowUnicornReveal({ counter }) {
-  const [image, setImage] = useState(null);
+  const [image, setImage] = useState(localStorage.getItem(IMAGE_KEY));
 
   useEffect(() => {
     async function fetchAndCropImage() {
-    const storedImage = localStorage.getItem(IMAGE_KEY);
-      if (storedImage) {
-        setImage(storedImage);
-        return;
-      }
-
-      try {       
+      try {
         const response = await fetch("https://api.unsplash.com/photos/random?query=unicorn&client_id=H6ll9IQKkde6fQWZQFXzHAx3RSduEtqf8j0L6pkCUbM");
         const jsonData = await response.json();
-        const photoUrl = jsonData.urls.regular; // Extracting the URL of the first photo
+        const photoUrl = jsonData.urls.regular; 
+
         const response2 = await fetch(photoUrl);
         const blob = await response2.blob();
         const img = await createImageBitmap(blob);
@@ -29,15 +24,23 @@ export default function RainbowUnicornReveal({ counter }) {
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
         const croppedImage = canvas.toDataURL("image/png");
-        localStorage.setItem(IMAGE_KEY, croppedImage);
-        setImage(croppedImage);
+        localStorage.setItem(IMAGE_KEY, croppedImage); // Cache the new image
+        setImage(croppedImage); // Update state
       } catch (error) {
         console.error("Error fetching image:", error);
       }
     }
 
-    fetchAndCropImage();
-  }, []);
+    if (counter === 0) {
+      fetchAndCropImage();
+    } else {
+      // Load cached image when counter > 0
+      const storedImage = localStorage.getItem(IMAGE_KEY);
+      if (storedImage) {
+        setImage(storedImage);
+      }
+    }
+  }, [counter]); // Re-run effect when counter changes
 
   const revealPercentage = counter / N;
   const maskStyle = {
