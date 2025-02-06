@@ -2,6 +2,11 @@ import { useState, useEffect } from "react";
 import {fetchCropAndSaveImage, IMAGE_KEY} from "../service/photoFetcher";
 
 export default function UnicornReveal({ counter, steps }) {
+
+  if (steps==undefined) {
+    console.log('steps is undefined, counter is', counter);
+    return;
+  }
   console.log(`UnicornReveal: counter=${counter}, steps=${steps}`);
 
   useEffect(() => {
@@ -14,26 +19,27 @@ export default function UnicornReveal({ counter, steps }) {
         }
       })();
     }
-  }, [counter]); 
+  }, [counter, steps]); 
 
   const revealPercentage = counter / steps;
   const image = localStorage.getItem(IMAGE_KEY);
+   
   const maskStyle = {
-    width: "100%",
-    height: "100%",
-    position: "fixed",
+    width: "100vw",
+    height: "100vh",
     top: 0,
     left: 0,
-    zIndex: -1, // Ensures it stays in the background
-    pointerEvents: "none", // Prevents blocking input elements above it
+    position: 'fixed', 
+    pointerEvents: "none", 
     backgroundImage: image ? `url(${image})` : "none",
     backgroundSize: "cover",
     backgroundPosition: "center",
     backgroundRepeat: "no-repeat",
-    WebkitMaskImage: `linear-gradient(to bottom, black ${revealPercentage * 100}%, transparent ${revealPercentage * 100}%)`,
-    maskImage: `linear-gradient(to bottom, black ${revealPercentage * 100}%, transparent ${revealPercentage * 100}%)`,
-    transition: "mask-image 0.5s ease-out, -webkit-mask-image 0.5s ease-out"
+    mixBlendMode: "overlay",
+    WebkitMaskImage: `linear-gradient(to bottom, rgba(0, 0, 0, 1) ${revealPercentage * 100}%, rgba(0, 0, 0, 0) ${revealPercentage * 120}%)`,
+    maskImage: `linear-gradient(to bottom, rgba(0, 0, 0, 1) ${revealPercentage * 100}%, rgba(0, 0, 0, 0) ${revealPercentage * 120}%)`,
+    transition: "opacity 0.5s ease-out, filter 0.5s ease-out"
   };
-  
+     
   return <div style={maskStyle}></div>;
 }
