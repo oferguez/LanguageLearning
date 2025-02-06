@@ -14,6 +14,9 @@ function App() {
     setStep((prev) => prev < TOTAL_STEPS ? prev + 1 : 0);
   }
 
+  const setting = () => {
+  }
+
   let game;
 
   if (step === 0) {
@@ -28,9 +31,14 @@ function App() {
             className="px-8 py-4 text-xl bg-gradient-to-r from-pink-500 to-purple-500
                      text-white rounded-full shadow-lg hover:shadow-xl
                      transform transition-all hover:scale-105"
-          >
-            Start Learning!
-          </button>
+          > Start Learning! </button>
+          <button
+            onClick={setting}
+            className="ml-4 px-8 py-4 text-xl bg-gradient-to-r from-pink-500 to-purple-500
+                     text-white rounded-full shadow-lg hover:shadow-xl
+                     transform transition-all hover:scale-105"
+          > Configure </button>
+
         </div>
         <UnicornReveal counter={0} steps={TOTAL_STEPS} />
       </div>
