@@ -1,3 +1,21 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.counter-container {
+    @apply flex justify-center items-center;
+}
+
+.counter-button {
+    @apply font-bold py-2 px-4 rounded-lg bg-blue-500 text-white hover:bg-blue-700 
+    inline-block cursor-pointer transition-colors duration-300;
+}
+
+.counter-value {
+    @apply font-bold text-xl inline-block mx-4 bg-gray-100 
+    py-2 px-6 rounded-lg shadow-md select-none;
+}
+
+.stats-container {
+    @apply flex flex-col items-center gap-4 p-4 rounded-lg shadow-sm bg-white text-lg font-medium; 
+}

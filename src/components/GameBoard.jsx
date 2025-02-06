@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Sparkles, PartyPopper as Party, Stars, Rocket, Crown } from 'lucide-react';
 import { words } from '../data/words.js';
+import RainbowUnicornReveal from './UnicornReveal.jsx';
 
 const ANIMATIONS = [
   { icon: Sparkles, color: 'text-yellow-400', animation: 'animate-spin' },
@@ -17,29 +18,30 @@ const GameBoard = ({ totalSteps, onGameComplete }) => {
   const [showAnimation, setShowAnimation] = useState(false);
   const [currentAnimation, setCurrentAnimation] = useState(ANIMATIONS[0]);
   const [revealedParts, setRevealedParts] = useState(0);
-  const [backgroundImage, setBackgroundImage] = useState(null);
+  // const [backgroundImage, setBackgroundImage] = useState(null);
 
-  useEffect(() => {
-    if (currentStep === 0 && !backgroundImage) {
-      fetch(`https://source.unsplash.com/random/?rainbow,unicorn&${Date.now()}`)
-        .then(response => response.blob())
-        .then(blob => {
-          const img = new Image();
-          img.onload = () => {
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            ctx.drawImage(img, 0, 0, window.innerWidth, window.innerHeight);
-            canvas.toBlob(blob => {
-              const localUrl = URL.createObjectURL(blob);
-              setBackgroundImage(localUrl);
-            });
-          };
-          img.src = URL.createObjectURL(blob);
-        });
-    }
-  }, [currentStep]);
+  // useEffect(() => {
+  //   if (currentStep === 0 && !backgroundImage) {
+  //     fetch(`https://source.unsplash.com/random/?rainbow,unicorn&${Date.now()}`)
+  //       .then(response => response.blob())
+  //       .then(blob => {
+  //         const img = new Image();
+  //         img.onload = () => {
+  //           const canvas = document.createElement('canvas');
+  //           const ctx = canvas.getContext('2d');
+  //           canvas.width = window.innerWidth;
+  //           canvas.height = window.innerHeight;
+  //           ctx.drawImage(img, 0, 0, window.innerWidth, window.innerHeight);
+  //           canvas.toBlob(blob => {
+  //             const localUrl = URL.createObjectURL(blob);
+  //             setBackgroundImage(localUrl);
+  //           });
+  //         };
+  //         img.src = URL.createObjectURL(blob);
+  //       });
+  //   }
+  // }, [currentStep]);
+
 
   useEffect(() => {
     const shuffled = [...words].sort(() => Math.random() - 0.5);
@@ -55,7 +57,7 @@ const GameBoard = ({ totalSteps, onGameComplete }) => {
         .sort(() => Math.random() - 0.5)
         .slice(0, 2)
         .map(w => w.english);
-      
+
       setOptions([correct, related, ...others].sort(() => Math.random() - 0.5));
     }
   }, [currentStep, gameWords]);
@@ -67,7 +69,7 @@ const GameBoard = ({ totalSteps, onGameComplete }) => {
       setCurrentAnimation(randomAnimation);
       setShowAnimation(true);
       setRevealedParts(prev => prev + 1);
-      
+
       setTimeout(() => {
         setShowAnimation(false);
         if (currentStep + 1 === totalSteps) {
@@ -82,27 +84,18 @@ const GameBoard = ({ totalSteps, onGameComplete }) => {
   if (!gameWords[currentStep]) return null;
 
   const AnimationIcon = currentAnimation.icon;
-  const revealPercentage = 100; // (revealedParts / totalSteps) * 100;
+  const revealPercentage = (revealedParts / totalSteps) * 100;
 
   return (
     <div className="relative w-full max-w-2xl mx-auto p-6">
-      {/* Background container with gradient overlay */}
-        <div className="fixed inset-0 overflow-hidden">
-            <div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-all duration-1000 ease-in-out"
-          style={{
-            transform: `scale(${Math.min(window.innerWidth / 800, window.innerHeight / 600)})`,
-            transformOrigin: 'center center',
-            //backgroundImage: `url('https://source.unsplash.com/random/?rainbow,unicorn&${Date.now()}')`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            //backgroundSize: `${window.innerWidth}px ${window.innerHeight}px`,
-            clipPath: `inset(${100 - revealPercentage}% 0 0 0)`,
-            opacity: 0.8
-          }}
-            />
-            {/* Progress overlay */}
-        <div 
+
+      {/* Background container*/}
+      <RainbowUnicornReveal counter={currentStep} steps={totalSteps} />
+
+      {/* Progress overlay */}
+      <div className="fixed inset-0 overflow-hidden">
+
+        <div
           className="absolute inset-0 bg-gradient-to-b from-transparent to-pink-100/50"
           style={{
             clipPath: `inset(${100 - revealPercentage}% 0 0 0)`
@@ -116,7 +109,7 @@ const GameBoard = ({ totalSteps, onGameComplete }) => {
             <h2 className="text-6xl mb-4 font-bold text-purple-600">
               {gameWords[currentStep].hebrew}
             </h2>
-            
+
             {showAnimation && (
               <div className="absolute inset-0 flex items-center justify-center">
                 {/* Multiple animated icons */}
@@ -156,7 +149,7 @@ const GameBoard = ({ totalSteps, onGameComplete }) => {
           </p>
           {/* Progress bar */}
           <div className="w-full h-2 bg-gray-200 rounded-full mt-2">
-            <div 
+            <div
               className="h-full bg-gradient-to-r from-pink-500 to-purple-500 rounded-full transition-all duration-500"
               style={{ width: `${revealPercentage}%` }}
             />
