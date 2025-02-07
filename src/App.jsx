@@ -1,24 +1,24 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import UnicornReveal from './components/UnicornReveal';
 import GameBoard from './components/GameBoard';
-import {ConfigModal} from './components/Preferences';
-
-
-const TOTAL_STEPS = 10;
+import {ConfigModal, RetrieveConfig} from './components/Preferences';
 
 function App() {
   const [step, setStep] = useState(0);
   const [isConfigOpen, setIsConfigOpen] = useState(false);
   const [config, setConfig] = useState({});
 
-  // open/close game
+  // retrieve current config on startup
+  useEffect(() => {
+    setConfig(() => RetrieveConfig());
+  }, []);
 
   const startNewGame = () => {
     setStep(() => 1);
   };
 
   const handleStepComplete = () => {
-    setStep((prev) => prev < TOTAL_STEPS ? prev + 1 : 0);
+    setStep((prev) => prev < config.steps ? prev + 1 : 0);
   }
   
   // open/close/save config 
@@ -54,13 +54,13 @@ function App() {
               onClick = {() => OpenCloseConfig(true)}
             > Configure </button>
           </div>
-          <UnicornReveal counter={0} steps={TOTAL_STEPS} />
+          <UnicornReveal counter={0} steps={config.steps} />
         </div>
         <ConfigModal isOpen={isConfigOpen} onClose={() => OpenCloseConfig(false)} onSave={onSaveConfig} />
       </>
       );
   }
-  else if (step > TOTAL_STEPS) {
+  else if (step > config.steps) {
     game = (
       <>
         <div className="min-h-screen bg-gradient-to-br from-pink-100 to-purple-100 flex items-center justify-center p-4">
@@ -81,7 +81,7 @@ function App() {
             </button>
           </div>
         </div>     
-        <UnicornReveal counter={step} steps={TOTAL_STEPS} />
+        <UnicornReveal counter={step} steps={config.steps} />
       </>
     );
   }
@@ -89,9 +89,9 @@ function App() {
     game = (
       <>
         <div className="min-h-screen bg-gradient-to-br from-pink-100/5 to-purple-100/5 p-4">
-          <GameBoard currentStep={step} totalSteps={TOTAL_STEPS} onStepComplete={handleStepComplete} />      
+          <GameBoard currentStep={step} totalSteps={config.steps} onStepComplete={handleStepComplete} words={config.words} />      
         </div>
-        <UnicornReveal counter={step} steps={TOTAL_STEPS} />
+        <UnicornReveal counter={step} steps={config.steps} />
       </>  
     );
   }

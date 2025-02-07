@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { words } from '../data/words.js';
 
-const GameBoard = ({ currentStep, totalSteps, onStepComplete }) => {
+const GameBoard = ({ currentStep, totalSteps, onStepComplete, words }) => {
   console.log('GameBoard: currentStep=', currentStep, 'totalSteps=', totalSteps);
 
   const [gameWords, setGameWords] = useState([]);
@@ -22,17 +21,17 @@ const GameBoard = ({ currentStep, totalSteps, onStepComplete }) => {
       console.error('GameBoard: gameWords is empty, currentStep=', currentStep);
       return;
     }
-    const correct = gameWords[currentStep-1].english
+    const correct = gameWords[currentStep-1].correct
     const related = gameWords[currentStep-1].related;
     const others = words
-      .filter(w => w.english !== correct && w.english !== related)
+      .filter(w => w.correct !== correct && w.related !== related)
       .sort(() => Math.random() - 0.5)
       .slice(0, 2)
-      .map(w => w.english);
+      .map(w => w.correct);
 
       setStepOptions({
-        question: gameWords[currentStep-1].hebrew,
-        correct: gameWords[currentStep-1].english,
+        question: gameWords[currentStep-1].question,
+        correct: gameWords[currentStep-1].correct,
         related: gameWords[currentStep-1].related,
         other1: others[0],
         other2: others[1]

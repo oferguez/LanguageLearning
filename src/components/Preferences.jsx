@@ -1,14 +1,20 @@
 import React, { useState } from "react";
 import {words as defaultWords} from "../data/words.js"; 
 
+const loadFromStorage = (key, defaultValue) => {
+  const storedValue = localStorage.getItem(key);
+  return storedValue ? JSON.parse(storedValue) : defaultValue;
+};
+
+export const RetrieveConfig = () => ({
+  words: loadFromStorage("searchWords", ["unicorn"]),
+  steps: loadFromStorage("steps", 5),
+  words: loadFromStorage("words", defaultWords)
+});
+
 export const ConfigModal = ({ isOpen, onClose, onSave }) => {
 
   if (!isOpen) return null; // Don't render when modal is closed
-
-  const loadFromStorage = (key, defaultValue) => {
-    const storedValue = localStorage.getItem(key);
-    return storedValue ? JSON.parse(storedValue) : defaultValue;
-  };
 
   const [searchWords, setSearchWords] = useState(() => loadFromStorage("searchWords", ["unicorn"]));
   const [steps, setSteps] = useState(() => loadFromStorage("steps", 5));
