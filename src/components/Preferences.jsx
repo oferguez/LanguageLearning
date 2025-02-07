@@ -1,11 +1,23 @@
 import React, { useState } from "react";
+import {words as defaultWords} from "../data/words.js"; 
 
 export const ConfigModal = ({ isOpen, onClose, onSave }) => {
-  const [searchWords, setSearchWords] = useState(["unicorn"]);
-  const [steps, setSteps] = useState(5);
-  const [words, setWords] = useState(Array(5).fill({ word: "", options: ["", "", "", ""] }));
 
   if (!isOpen) return null; // Don't render when modal is closed
+
+  const loadFromStorage = (key, defaultValue) => {
+    const storedValue = localStorage.getItem(key);
+    return storedValue ? JSON.parse(storedValue) : defaultValue;
+  };
+
+  const [searchWords, setSearchWords] = useState(() => loadFromStorage("searchWords", ["unicorn"]));
+  const [steps, setSteps] = useState(() => loadFromStorage("steps", 5));
+  const [words, setWords] = useState(() => loadFromStorage("words", defaultWords));
+
+  // const [searchWords, setSearchWords] = useState(["unicorn"]);
+  // const [steps, setSteps] = useState(5);
+  // const [words, setWords] = useState(Array(5).fill({ question: "", correct: "", related: "", other1: "", other2: "" }));
+
 
   // Update search words dynamically
   const handleSearchWordChange = (index, value) => {
@@ -13,7 +25,6 @@ export const ConfigModal = ({ isOpen, onClose, onSave }) => {
     updatedWords[index] = value;
     setSearchWords(updatedWords);
   };
-
   const addSearchWord = () => setSearchWords([...searchWords, ""]);
   const removeSearchWord = (index) => setSearchWords(searchWords.filter((_, i) => i !== index));
 
@@ -21,24 +32,37 @@ export const ConfigModal = ({ isOpen, onClose, onSave }) => {
   const handleStepsChange = (value) => {
     const stepValue = Math.max(5, Math.min(15, value));
     setSteps(stepValue);
-    setWords(Array(stepValue).fill({ word: "", options: ["", "", "", ""] }));
   };
 
   // Update word and translations
-  const handleWordChange = (index, value) => {
+  const handleWordChange = (index, property, value) => {
     const updatedWords = [...words];
-    updatedWords[index].word = value;
+    updatedWords[index][property] = value;
     setWords(updatedWords);
   };
 
-  const handleOptionChange = (wordIndex, optionIndex, value) => {
-    const updatedWords = [...words];
-    updatedWords[wordIndex].options[optionIndex] = value;
-    setWords(updatedWords);
+  // Add a new word entry
+  const addWord = () => {
+    setWords([...words, { question: "", correct: "", related: "" }]);
   };
+
+  // Remove a word entry
+  const removeWord = (index) => {
+    setWords(words.filter((_, i) => i !== index));
+  };
+  // const handleOptionChange = (wordIndex, optionIndex, value) => {
+  //   const updatedWords = [...words];
+  //   updatedWords[wordIndex].options[optionIndex] = value;
+  //   setWords(updatedWords);
+  // };
+
+  //handleWordChange(wordIndex, 'related', e.target.value)}
 
   // Save the configuration and close the modal
   const handleSave = () => {
+    localStorage.setItem("searchWords", JSON.stringify(searchWords));
+    localStorage.setItem("steps", JSON.stringify(steps));
+    localStorage.setItem("words", JSON.stringify(words));
     onSave({ searchWords, steps, words });
     onClose();
   };
@@ -57,7 +81,7 @@ export const ConfigModal = ({ isOpen, onClose, onSave }) => {
                 type="text"
                 value={word}
                 onChange={(e) => handleSearchWordChange(index, e.target.value)}
-                className="border p-2 flex-1 rounded-md"
+                className="border-2 p-2 flex-1 rounded-md"
               />
               {searchWords.length > 1 && (
                 <button onClick={() => removeSearchWord(index)} className="ml-2 px-2 py-1 bg-red-500 text-white rounded-md">
@@ -66,7 +90,12 @@ export const ConfigModal = ({ isOpen, onClose, onSave }) => {
               )}
             </div>
           ))}
-          <button onClick={addSearchWord} className="mt-2 px-3 py-1 bg-blue-500 text-white rounded-md">+ Add Word</button>
+          { searchWords.every(w => w.length > 0) &&
+            <button onClick={addSearchWord} 
+            className="mt-2 px-3 py-1 bg-blue-500 text-white rounded-md">
+              + Add Word
+            </button>
+          }
         </div>
 
         {/* Step Selection */}
@@ -78,38 +107,53 @@ export const ConfigModal = ({ isOpen, onClose, onSave }) => {
             max="15"
             value={steps}
             onChange={(e) => handleStepsChange(parseInt(e.target.value, 10))}
-            className="border p-2 rounded-md w-full"
+            className="border-2 p-2 rounded-md w-full"
           />
         </div>
 
         {/* Words & Translations */}
-        <div className="mb-4 max-h-64 overflow-y-auto">
-          <label className="font-semibold block mb-2">Words & Translations</label>
-          {words.map((wordItem, wordIndex) => (
-            <div key={wordIndex} className="mb-4 p-3 border rounded-lg">
-              <input
+        <label className="font-semibold block mb-2">Words & Translations</label>
+        <div className="mb-4 max-h-64 overflow-y-auto pr-4">
+          {words.map((wordItem, wordIndex) => (                        
+            <div key={wordIndex} className="mb-4 p-3 border-4 rounded-lg">
+
+              <input //Question
                 type="text"
-                value={wordItem.word}
-                onChange={(e) => handleWordChange(wordIndex, e.target.value)}
-                placeholder={`Word ${wordIndex + 1}`}
-                className="border p-2 rounded-md w-full mb-2"
+                value={wordItem.question} //question: "", correct: "", related: "", other1: "", other2: "" }));
+                onChange={(e) => handleWordChange(wordIndex, 'question', e.target.value)}
+                placeholder={`Question Word ${wordIndex + 1}`}
+                className="border-2 p-2 rounded-md w-full mb-2"
               />
-              {wordItem.options.map((option, optionIndex) => (
-                <input
-                  key={optionIndex}
-                  type="text"
-                  value={option}
-                  onChange={(e) => handleOptionChange(wordIndex, optionIndex, e.target.value)}
-                  placeholder={`Option ${optionIndex + 1}`}
-                  className="border p-2 rounded-md w-full mb-1"
-                />
-              ))}
+              <input //Correct Answers
+                type="text"
+                value={wordItem.correct}
+                onChange={(e) => handleWordChange(wordIndex, 'correct', e.target.value)}
+                placeholder={`Correct Answer ${wordIndex + 1}`}
+                className="border-2 p-2 rounded-md w-full mb-1"
+              />
+              <input //Related Answer
+                type="text"
+                value={wordItem.related}
+                onChange={(e) => handleWordChange(wordIndex, 'related', e.target.value)}
+                placeholder={`Related Answer ${wordIndex + 1}`}
+                className="border-2 p-2 rounded-md w-full mb-1"
+              />
+              <button
+                  onClick={() => removeWord(wordIndex)}
+                  className="border-2 p-2 rounded-md w-full mb-1">  
+              ✖ Remove Entry </button>
+
             </div>
           ))}
         </div>
 
+        {/* Add Word Button */}
+        <button onClick={addWord} className="w-full bg-blue-500 text-white p-2 rounded-md font-semibold hover:bg-blue-600">
+          + Add Entry
+        </button>
+
         {/* Buttons */}
-        <div className="flex justify-end space-x-2">
+        <div className="flex justify-center pt-4 space-x-4">
           <button onClick={onClose} className="px-4 py-2 bg-gray-400 text-white rounded-md">Cancel</button>
           <button onClick={handleSave} className="px-4 py-2 bg-green-500 text-white rounded-md">Save</button>
         </div>

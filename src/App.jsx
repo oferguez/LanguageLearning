@@ -31,7 +31,6 @@ function App() {
     setConfig(() => newConfig);
   }
 
-
   let game;
 
   if (step === 0) {
