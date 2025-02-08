@@ -22,31 +22,33 @@ export const ConfigModal = ({ isOpen, onClose, onSave }) => {
   const [steps, setSteps] = useState(() => loadFromStorage("steps", 5));
   const [words, setWords] = useState(() => loadFromStorage("words", defaultWords));
 
-  // Update handlers
+  // Handlers for updating searchWords
   const handleSearchWordChange = (index, value) => {
     const updatedWords = [...searchWords];
     updatedWords[index] = value;
     setSearchWords(updatedWords);
   };
-
   const addSearchWord = () => setSearchWords([...searchWords, ""]);
   const removeSearchWord = (index) => setSearchWords(searchWords.filter((_, i) => i !== index));
 
+  // Steps handler
   const handleStepsChange = (value) => {
     const stepValue = Math.max(5, Math.min(15, value));
     setSteps(stepValue);
   };
 
+  // Handlers for words
   const handleWordChange = (index, property, value) => {
     const updatedWords = [...words];
     updatedWords[index][property] = value;
     setWords(updatedWords);
   };
 
+  // Add new word
   const addWord = () => {
     setWords([
       ...words,
-      { question: "", correct: "", related: "", other1: "", other2: "" },
+      { question: "", correct: "", related: "", other1: "", other2: "" }, // Empty object structure
     ]);
   };
 
@@ -89,7 +91,7 @@ export const ConfigModal = ({ isOpen, onClose, onSave }) => {
             </div>
           ))}
           <button onClick={addSearchWord} className="mt-2 px-3 py-1 bg-blue-500 text-white rounded-md">
-            + Add Word
+            + Add Search Word
           </button>
         </div>
 
@@ -144,6 +146,14 @@ export const ConfigModal = ({ isOpen, onClose, onSave }) => {
           </table>
         </div>
 
+        {/* Add Word Button */}
+        <button
+          onClick={addWord}
+          className="w-full mt-4 bg-blue-500 text-white p-2 rounded-md font-semibold hover:bg-blue-600"
+        >
+          + Add Word
+        </button>
+
         {/* Save and Cancel */}
         <div className="flex justify-end space-x-4 mt-4">
           <button onClick={onClose} className="px-4 py-2 bg-gray-400 text-white rounded-md">
@@ -157,25 +167,3 @@ export const ConfigModal = ({ isOpen, onClose, onSave }) => {
     </div>
   );
 };
-
-// Main Component
-const ConfigScreen = () => {
-  const [isModalOpen, setModalOpen] = useState(false);
-  const [config, setConfig] = useState(null);
-
-  const handleSaveConfig = (newConfig) => setConfig(newConfig);
-
-  return (
-    <div className="flex flex-col items-center">
-      <button onClick={() => setModalOpen(true)} className="mt-4 px-6 py-2 bg-blue-500 text-white rounded-md">
-        Configure
-      </button>
-      {config && (
-        <pre className="mt-4 bg-white p-4 rounded shadow">{JSON.stringify(config, null, 2)}</pre>
-      )}
-      <ConfigModal isOpen={isModalOpen} onClose={() => setModalOpen(false)} onSave={handleSaveConfig} />
-    </div>
-  );
-};
-
-export default ConfigScreen;

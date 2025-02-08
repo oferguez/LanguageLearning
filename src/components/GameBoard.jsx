@@ -21,21 +21,7 @@ const GameBoard = ({ currentStep, totalSteps, onStepComplete, words }) => {
       console.error('GameBoard: gameWords is empty, currentStep=', currentStep);
       return;
     }
-    const correct = gameWords[currentStep-1].correct
-    const related = gameWords[currentStep-1].related;
-    const others = words
-      .filter(w => w.correct !== correct && w.related !== related)
-      .sort(() => Math.random() - 0.5)
-      .slice(0, 2)
-      .map(w => w.correct);
-
-      setStepOptions({
-        question: gameWords[currentStep-1].question,
-        correct: gameWords[currentStep-1].correct,
-        related: gameWords[currentStep-1].related,
-        other1: others[0],
-        other2: others[1]
-        });
+    setStepOptions(gameWords[currentStep-1]);
   }, [gameWords,currentStep]);
 
   const handleAnswer = (answer) => {
