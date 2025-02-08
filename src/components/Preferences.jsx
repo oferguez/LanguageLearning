@@ -7,7 +7,7 @@ const loadFromStorage = (key, defaultValue) => {
 };
 
 export const RetrieveConfig = () => ({
-  words: loadFromStorage("searchWords", ["unicorn"]),
+  searchWords: loadFromStorage("searchWords", ["unicorn"]),
   steps: loadFromStorage("steps", 5),
   words: loadFromStorage("words", defaultWords)
 });

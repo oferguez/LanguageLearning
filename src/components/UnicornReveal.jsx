@@ -1,25 +1,26 @@
 import { useState, useEffect } from "react";
 import {fetchCropAndSaveImage, IMAGE_KEY} from "../service/photoFetcher";
 
-export default function UnicornReveal({ counter, steps }) {
+export default function UnicornReveal({ counter, steps, searchWords }) {
 
-  if (steps==undefined) {
+  if (steps===undefined) {
     console.log('steps is undefined, counter is', counter);
     return;
   }
   console.log(`UnicornReveal: counter=${counter}, steps=${steps}`);
 
   useEffect(() => {
+    console.log(`UnicornReveal: useEffect: counter=${counter}, steps=${steps}`);
     if (counter === 0) {
       (async () => {
         try {
-          await fetchCropAndSaveImage();
+          await fetchCropAndSaveImage(searchWords);
         } catch (error) {
           console.error("Error in UnicornReveal:", error);
         }
       })();
     }
-  }, [counter, steps]); 
+  }, [counter]); 
 
   const revealPercentage = counter / steps;
   const image = localStorage.getItem(IMAGE_KEY);

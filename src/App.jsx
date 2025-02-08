@@ -6,12 +6,12 @@ import {ConfigModal, RetrieveConfig} from './components/Preferences';
 function App() {
   const [step, setStep] = useState(0);
   const [isConfigOpen, setIsConfigOpen] = useState(false);
-  const [config, setConfig] = useState({});
+  const [config, setConfig] = useState(() => RetrieveConfig());
 
   // retrieve current config on startup
-  useEffect(() => {
-    setConfig(() => RetrieveConfig());
-  }, []);
+  // useEffect(() => {
+  //   setConfig(() => RetrieveConfig());
+  // }, []);
 
   const startNewGame = () => {
     setStep(() => 1);
@@ -34,6 +34,7 @@ function App() {
   let game;
 
   if (step === 0) {
+    console.log('APP: Init: step is 0');
     game = (
       <>
         <div className="min-h-screen bg-gradient-to-br from-pink-100 to-purple-100 flex items-center justify-center p-4">
@@ -54,13 +55,14 @@ function App() {
               onClick = {() => OpenCloseConfig(true)}
             > Configure </button>
           </div>
-          <UnicornReveal counter={0} steps={config.steps} />
+          <UnicornReveal counter={0} steps={config.steps} searchWords={config.searchWords}/>
         </div>
         <ConfigModal isOpen={isConfigOpen} onClose={() => OpenCloseConfig(false)} onSave={onSaveConfig} />
       </>
       );
   }
   else if (step > config.steps) {
+    console.log(`APP: GameOver: step:${step} > ${config.steps}`);
     game = (
       <>
         <div className="min-h-screen bg-gradient-to-br from-pink-100 to-purple-100 flex items-center justify-center p-4">
@@ -81,17 +83,18 @@ function App() {
             </button>
           </div>
         </div>     
-        <UnicornReveal counter={step} steps={config.steps} />
+        <UnicornReveal counter={step} steps={config.steps} searchWords={config.searchWords}/>
       </>
     );
   }
   else {
+    console.log(`APP: InGame: step:${step}`);
     game = (
       <>
         <div className="min-h-screen bg-gradient-to-br from-pink-100/5 to-purple-100/5 p-4">
           <GameBoard currentStep={step} totalSteps={config.steps} onStepComplete={handleStepComplete} words={config.words} />      
         </div>
-        <UnicornReveal counter={step} steps={config.steps} />
+        <UnicornReveal counter={step} steps={config.steps} searchWords={config.searchWords}/>
       </>  
     );
   }

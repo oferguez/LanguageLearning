@@ -2,10 +2,10 @@ import { apikey } from "../data/apikey.js";
 import backupPhoto from '../data/photo.jpg';
 export const IMAGE_KEY = "unicorn_image";
 
-export async function fetchCropAndSaveImage() {
+export async function fetchCropAndSaveImage(searchWords) {
   let img = null;
   try {
-    img = await downloadRandomImage();
+    img = await downloadRandomImage(searchWords);
   }
   catch (error) {
     try {     
@@ -27,14 +27,15 @@ export async function fetchCropAndSaveImage() {
   } 
 }
 
-async function downloadRandomImage() {
-  const response1 = await fetch(`https://api.unsplash.com/photos/random?query=unicorn&client_id=${apikey}`);
+async function downloadRandomImage(searchWords) {
+  const queryString = searchWords.join(",");
+  const response1 = await fetch(`https://api.unsplash.com/photos/random?query=${queryString}&client_id=${apikey}`);
   const jsonData = await response1.json();
   const photoUrl = jsonData.urls.regular; 
   const response2 = await fetch(photoUrl);
   const blob = await response2.blob();
   const img = await createImageBitmap(blob);
-  console.log(`Downloaded Image: ${img} w=${img.width} h=${img.height}`);
+  console.log(`Downloaded Image: query=${queryString} ${img} w=${img.width} h=${img.height}`);
   return img;
 }
 
