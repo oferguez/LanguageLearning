@@ -1,13 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 
 const GameBoard = ({ currentStep, totalSteps, onStepComplete, words }) => {
-  console.log('GameBoard: currentStep=', currentStep, 'totalSteps=', totalSteps);
+  console.log(
+    "GameBoard: currentStep=",
+    currentStep,
+    "totalSteps=",
+    totalSteps,
+  );
 
   const [gameWords, setGameWords] = useState([]);
   const [stepOptions, setStepOptions] = useState(null);
 
   useEffect(() => {
-    console.log('GameBoard: useEffect1 currentStep=', currentStep);
+    console.log("GameBoard: useEffect1 currentStep=", currentStep);
     if (currentStep === 1) {
       const shuffled = [...words].sort(() => Math.random() - 0.5);
       setGameWords(() => shuffled.slice(0, totalSteps));
@@ -15,25 +20,24 @@ const GameBoard = ({ currentStep, totalSteps, onStepComplete, words }) => {
   }, [currentStep]);
 
   useEffect(() => {
-    console.log(`GameBoard: useEffect2 currentStep=${currentStep} gamewords=${gameWords}` );
-    if (! gameWords[currentStep-1])
-    {
-      console.error('GameBoard: gameWords is empty, currentStep=', currentStep);
+    console.log(
+      `GameBoard: useEffect2 currentStep=${currentStep} gamewords=${gameWords}`,
+    );
+    if (!gameWords[currentStep - 1]) {
+      console.error("GameBoard: gameWords is empty, currentStep=", currentStep);
       return;
     }
-    setStepOptions(gameWords[currentStep-1]);
-  }, [gameWords,currentStep]);
+    setStepOptions(gameWords[currentStep - 1]);
+  }, [gameWords, currentStep]);
 
   const handleAnswer = (answer) => {
     if (answer === stepOptions.correct) {
-          onStepComplete();
+      onStepComplete();
     }
   };
 
   return (
     <div className="relative w-full max-w-2xl mx-auto p-6">
-
-
       <div className="relative z-10">
         <div className="relative mb-8">
           <div className="text-center">
@@ -44,19 +48,25 @@ const GameBoard = ({ currentStep, totalSteps, onStepComplete, words }) => {
         </div>
 
         <div className="grid grid-cols-2 gap-4">
-          { stepOptions &&
-            [stepOptions.correct, stepOptions.related, stepOptions.other1, stepOptions.other2]
-            .sort(() => Math.random() - 0.5)
-            .map((option, index) => (
-              <button
-                key={index}
-                onClick={() => handleAnswer(option)}
-                className="p-4 text-lg rounded-xl transition-all transform hover:scale-105
+          {stepOptions &&
+            [
+              stepOptions.correct,
+              stepOptions.related,
+              stepOptions.other1,
+              stepOptions.other2,
+            ]
+              .sort(() => Math.random() - 0.5)
+              .map((option, index) => (
+                <button
+                  key={index}
+                  onClick={() => handleAnswer(option)}
+                  className="p-4 text-lg rounded-xl transition-all transform hover:scale-105
                         bg-gradient-to-r from-pink-500 to-purple-500 text-white
-                        shadow-lg hover:shadow-xl disabled:opacity-50">
-              {option}
-            </button>
-          ))}
+                        shadow-lg hover:shadow-xl disabled:opacity-50"
+                >
+                  {option}
+                </button>
+              ))}
         </div>
 
         <div className="mt-6 text-center">
@@ -65,7 +75,19 @@ const GameBoard = ({ currentStep, totalSteps, onStepComplete, words }) => {
           </p>
         </div>
 
+        <div className="flex justify-center items-center">
+          <button
+            onClick={() => alert("boo")}
+            className="p-4 text-lg rounded-xl transition-all transform hover:scale-105
+              bg-gradient-to-r from-pink-500 to-purple-500 text-white
+              shadow-lg hover:shadow-xl disabled:opacity-50"
+          >
+            Exit
+          </button>
+        </div>
       </div>
+
+      
     </div>
   );
 };
