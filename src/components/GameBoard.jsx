@@ -32,6 +32,9 @@ const GameBoard = ({ currentStep, totalSteps, onStepComplete, onExit, words }) =
 
   const handleAnswer = (answer) => {
     if (answer === stepOptions.correct) {
+      if (currentStep === totalSteps) {
+        playWinningAnimation();
+      }
       onStepComplete();
     }
   };
