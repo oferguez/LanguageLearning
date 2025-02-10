@@ -19,3 +19,24 @@
 .stats-container {
     @apply flex flex-col items-center gap-4 p-4 rounded-lg shadow-sm bg-white text-lg font-medium; 
 }
+
+@keyframes wiggle {
+    0% { transform: translate(-50%, -50%) rotate(-5deg) translateX(100px) translateY(-100px); }
+    25% { transform: translate(-50%, -48%) rotate(5deg) translateX(100px) translateY(50px); }
+    50% { transform: translate(-50%, -50%) rotate(-5deg) translateX(-150px) translateY(50px); }
+    75% { transform: translate(-50%, -52%) rotate(5deg) translateX(100px) translateY(100px); }
+    100% { transform: translate(-50%, -50%) rotate(-5deg) translateX(-100px) translateY(-100px); }
+  }
+
+.winning-message {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 8rem;
+    font-weight: bold;
+    color: #ff6600; /* Orange text color */
+    text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
+    animation: wiggle 1s infinite ease-in-out;
+}
+  

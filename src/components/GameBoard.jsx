@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import confetti from 'canvas-confetti';
 
 const GameBoard = ({ currentStep, totalSteps, onStepComplete, onExit, words }) => {
   console.log(
@@ -20,9 +21,7 @@ const GameBoard = ({ currentStep, totalSteps, onStepComplete, onExit, words }) =
   }, [currentStep]);
 
   useEffect(() => {
-    console.log(
-      `GameBoard: useEffect2 currentStep=${currentStep} gamewords=${gameWords}`,
-    );
+    console.log(`GameBoard: useEffect2 currentStep=${currentStep} gamewords=${gameWords}`);
     if (!gameWords[currentStep - 1]) {
       console.error("GameBoard: gameWords is empty, currentStep=", currentStep);
       return;
@@ -33,52 +32,44 @@ const GameBoard = ({ currentStep, totalSteps, onStepComplete, onExit, words }) =
   const handleAnswer = (answer) => {
     if (answer === stepOptions.correct) {
       if (currentStep === totalSteps) {
-        playWinningAnimation();
+        playWinningAnimation(2000);
       }
       onStepComplete();
     }
   };
 
-  const playWinningAnimation = () => {
-    const confetti = require('canvas-confetti');
-    const duration = 3000; // Animation duration in milliseconds
-    const animationEnd = Date.now() + duration;
-    const defaults = {
-      startVelocity: 30,
-      spread: 360,
-      ticks: 60,
-      zIndex: 100,
-      particleCount: 50,
-      origin: { x: 0.5, y: 0.6 }
+  const playWinningAnimation = (duration) => {
+    const end = Date.now() + duration;
+
+    // Create the message element
+    const message = document.createElement("div");
+    message.classList.add("winning-message"); 
+    message.innerText = "Well done, Shira! 🎉";
+    document.body.appendChild(message);
+
+    // Confetti animation loop
+    const frame = () => {
+        confetti({
+            particleCount: 5,  
+            spread: 360,  
+            startVelocity: 30,  
+            gravity: 2,  
+            scalar: 1.5,  
+            origin: { x: 0.5, y: 0.5 }, 
+        });
+
+        if (Date.now() < end) {
+            requestAnimationFrame(frame);
+        }
+        else {
+            document.body.removeChild(message);
+        }
     };
-  
-    function randomInRange(min, max) {
-      return Math.random() * (max - min) + min;
-    }
-  
-    const interval = setInterval(() => {
-      const timeLeft = animationEnd - Date.now();
-  
-      if (timeLeft <= 0) {
-        clearInterval(interval);
-        return;
-      }
-  
-      const particleCount = 50 * (timeLeft / duration);
-  
-      confetti({
-        ...defaults,
-        particleCount,
-        origin: { x: randomInRange(0.1, 0.9), y: Math.random() - 0.2 },
-        colors: ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff'],
-        shapes: ['circle', 'square'],
-        gravity: 1.5,
-        scalar: 2,
-        drift: 0
-      });
-    }, 250);
+
+    frame();
   };
-    const handleExit = () => {
+
+  const handleExit = () => {
     onExit();
   }
   
