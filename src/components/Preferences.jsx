@@ -99,7 +99,7 @@ export const ConfigModal = ({ isOpen, onClose, onSave }) => {
 
         {/* Button Row */}
         <div className="flex items-center space-x-4 mb-4">
-          <button onClick={toggleSelectAll} className="px-3 py-1 bg-gray-500 text-white rounded-md">
+          <button onClick={toggleSelectAll} className="px-3 py-1 bg-blue-500 text-white rounded-md">
             {selectedWords.size === words.length ? "Deselect All" : "Select All"}
           </button>
           <button onClick={addNewWord} className="px-3 py-1 bg-blue-500 text-white rounded-md">
@@ -124,6 +124,15 @@ export const ConfigModal = ({ isOpen, onClose, onSave }) => {
               <option value="Chinese">Chinese</option>
             </select>
           </div>
+
+          {/* Use AI Button */}
+          <button
+            onClick={() => console.log("Use AI called")}
+            className="px-3 py-1 bg-blue-500 text-white rounded-md"
+          >
+            AI Auto Suggest
+          </button>
+
         </div>
 
         {/* Words Table */}
