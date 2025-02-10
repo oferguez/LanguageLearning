@@ -120,17 +120,19 @@ export const ConfigModal = ({ isOpen, onClose, onSave }) => {
           />
         </div>
 
-        {/* Select/Deselect, Add Word, Target Language */}
-        <div className="flex space-x-4 mb-4">
-          <button onClick={toggleSelectAll} className="px-3 py-1 bg-gray-500 text-white rounded-md">
+        {/* Button Row (Select All, Add Word, Target Language) */}
+        <div className="flex items-center space-x-4 mb-4">
+          <button
+            onClick={toggleSelectAll}
+            className="px-3 py-1 bg-gray-500 text-white rounded-md"
+          >
             {selectedWords.size === words.length ? "Deselect All" : "Select All"}
           </button>
           <button onClick={addNewWord} className="px-3 py-1 bg-blue-500 text-white rounded-md">
             + Add Word
           </button>
-
-          <div className="flex items-center space-x-4 mb-4">
-            <label htmlFor="targetLanguage" className="font-semibold self-center">
+          <div className="flex items-center space-x-2">
+            <label htmlFor="targetLanguage" className="font-semibold">
               Target Language:
             </label>
             <select
@@ -147,12 +149,11 @@ export const ConfigModal = ({ isOpen, onClose, onSave }) => {
               <option value="Italian">Italian</option>
               <option value="Chinese">Chinese</option>
             </select>
-        </div>
-
+          </div>
         </div>
 
         {/* Words Table */}
-        <div className="overflow-y-auto max-h-[300px] border border-gray-400 rounded-md">
+        <div className="overflow-y-scroll max-h-[300px] border border-gray-400 rounded-md">
           <table className="table-auto w-full border-collapse">
             <thead className="bg-gray-300 border border-gray-400">
               <tr>
@@ -169,17 +170,34 @@ export const ConfigModal = ({ isOpen, onClose, onSave }) => {
               {words.map((word, index) => (
                 <tr key={index} className="hover:bg-gray-100 border border-gray-400">
                   <td className="border border-gray-400 p-2 text-center">
-                    <input type="checkbox" checked={selectedWords.has(index)} onChange={() => toggleSelect(index)} />
+                    <input
+                      type="checkbox"
+                      checked={selectedWords.has(index)}
+                      onChange={() => toggleSelect(index)}
+                    />
                   </td>
                   {["question", "correct", "related", "other1", "other2"].map((key) => (
                     <td key={key} className="border border-gray-400 p-2">
-                      <input type="text" value={word[key]} onChange={(e) => {
-                        const updated = [...words];
-                        updated[index][key] = e.target.value;
-                        setWords(updated);
-                      }} className="w-full border rounded-md p-1"/>
+                      <input
+                        type="text"
+                        value={word[key]}
+                        onChange={(e) => {
+                          const updated = [...words];
+                          updated[index][key] = e.target.value;
+                          setWords(updated);
+                        }}
+                        className="w-full border rounded-md p-1"
+                      />
                     </td>
                   ))}
+                  <td className="border border-gray-400 p-2 text-center">
+                    <button
+                      onClick={() => setWords(words.filter((_, i) => i !== index))}
+                      className="px-2 py-1 bg-red-500 text-white rounded-md hover:bg-red-600"
+                    >
+                      ✖
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>
