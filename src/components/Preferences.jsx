@@ -33,7 +33,7 @@ export const ConfigModal = ({ isOpen, onClose, onSave }) => {
 
   // Steps handler
   const handleStepsChange = (value) => {
-    const stepValue = Math.max(5, Math.min(15, value));
+    const stepValue = Math.max(3, Math.min(15, value));
     setSteps(stepValue);
   };
 

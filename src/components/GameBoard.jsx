@@ -41,45 +41,44 @@ const GameBoard = ({ currentStep, totalSteps, onStepComplete, onExit, words }) =
 
   const playWinningAnimation = () => {
     const confetti = require('canvas-confetti');
-      const duration = 3000; // Animation duration in milliseconds
-      const animationEnd = Date.now() + duration;
-      const defaults = {
-        startVelocity: 30,
-        spread: 360,
-        ticks: 60,
-        zIndex: 100,
-        particleCount: 50,
-        origin: { x: 0.5, y: 0.6 }
-      };
-
-      function randomInRange(min, max) {
-        return Math.random() * (max - min) + min;
+    const duration = 3000; // Animation duration in milliseconds
+    const animationEnd = Date.now() + duration;
+    const defaults = {
+      startVelocity: 30,
+      spread: 360,
+      ticks: 60,
+      zIndex: 100,
+      particleCount: 50,
+      origin: { x: 0.5, y: 0.6 }
+    };
+  
+    function randomInRange(min, max) {
+      return Math.random() * (max - min) + min;
+    }
+  
+    const interval = setInterval(() => {
+      const timeLeft = animationEnd - Date.now();
+  
+      if (timeLeft <= 0) {
+        clearInterval(interval);
+        return;
       }
-
-      const interval = setInterval(() => {
-        const timeLeft = animationEnd - Date.now();
-
-        if (timeLeft <= 0) {
-          return clearInterval(interval);
-        }
-
-        const particleCount = 50 * (timeLeft / duration);
-        
-        confetti({
-          ...defaults,
-          particleCount,
-          origin: { x: randomInRange(0.1, 0.9), y: Math.random() - 0.2 },
-          colors: ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff'],
-          shapes: ['circle', 'square'],
-          gravity: 1.5,
-          scalar: 2,
-          drift: 0
-        });
-      }, 250);
-    });
+  
+      const particleCount = 50 * (timeLeft / duration);
+  
+      confetti({
+        ...defaults,
+        particleCount,
+        origin: { x: randomInRange(0.1, 0.9), y: Math.random() - 0.2 },
+        colors: ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff'],
+        shapes: ['circle', 'square'],
+        gravity: 1.5,
+        scalar: 2,
+        drift: 0
+      });
+    }, 250);
   };
-
-  const handleExit = () => {
+    const handleExit = () => {
     onExit();
   }
   
