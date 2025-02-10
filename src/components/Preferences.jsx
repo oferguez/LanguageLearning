@@ -1,72 +1,82 @@
 import React, { useState } from "react";
 import { words as defaultWords } from "../data/words.js";
 
-// Load from localStorage or use defaults
 const loadFromStorage = (key, defaultValue) => {
   const storedValue = localStorage.getItem(key);
   return storedValue ? JSON.parse(storedValue) : defaultValue;
 };
 
-// Retrieve Config
 export const RetrieveConfig = () => ({
   searchWords: loadFromStorage("searchWords", ["unicorn"]),
   steps: loadFromStorage("steps", 5),
   words: loadFromStorage("words", defaultWords),
 });
 
-// Modal Component
 export const ConfigModal = ({ isOpen, onClose, onSave }) => {
   if (!isOpen) return null;
 
-  const [searchWords, setSearchWords] = useState(() => loadFromStorage("searchWords", ["unicorn"]));
-  const [steps, setSteps] = useState(() => loadFromStorage("steps", 5));
-  const [words, setWords] = useState(() => loadFromStorage("words", defaultWords));
+  const [searchWords, setSearchWords] = useState(loadFromStorage("searchWords", ["unicorn"]));
+  const [steps, setSteps] = useState(loadFromStorage("steps", 5));
+  const [words, setWords] = useState(loadFromStorage("words", defaultWords));
+  const [selectedWords, setSelectedWords] = useState(new Set());
+  const [targetLanguage, setTargetLanguage] = useState("English (UK)");
 
-  // Handlers for updating searchWords
-  const handleSearchWordChange = (index, value) => {
-    const updatedWords = [...searchWords];
-    updatedWords[index] = value;
-    setSearchWords(updatedWords);
-  };
-  const addSearchWord = () => setSearchWords([...searchWords, ""]);
-  const removeSearchWord = (index) => setSearchWords(searchWords.filter((_, i) => i !== index));
-
-  // Steps handler
-  const handleStepsChange = (value) => {
-    const stepValue = Math.max(3, Math.min(15, value));
-    setSteps(stepValue);
+  const toggleSelectAll = () => {
+    if (selectedWords.size === words.length) {
+      setSelectedWords(new Set());
+    } else {
+      setSelectedWords(new Set(words.map((_, i) => i)));
+    }
   };
 
-  // Handlers for words
-  const handleWordChange = (index, property, value) => {
-    const updatedWords = [...words];
-    updatedWords[index][property] = value;
-    setWords(updatedWords);
+  const toggleSelect = (index) => {
+    const newSelected = new Set(selectedWords);
+    newSelected.has(index) ? newSelected.delete(index) : newSelected.add(index);
+    setSelectedWords(newSelected);
   };
 
-  // Add new word
-  const addWord = () => {
-    setWords([
-      ...words,
-      { question: "", correct: "", related: "", other1: "", other2: "" }, // Empty object structure
-    ]);
+  const addNewWord = () => {
+    setWords([...words, { question: "", correct: "", related: "", other1: "", other2: "" }]);
   };
 
-  const removeWord = (index) => {
-    setWords(words.filter((_, i) => i !== index));
+  const fetchAIAnswers = async (index) => {
+    const word = words[index];
+
+    try {
+      const response = await fetch("/api/gpt-answers", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          question: word.question,
+          targetLanguage,
+        }),
+      });
+
+      const data = await response.json();
+      const updatedWords = [...words];
+      updatedWords[index] = {
+        ...updatedWords[index],
+        correct: data.correct,
+        related: data.related,
+        other1: data.other1,
+        other2: data.other2,
+      };
+
+      setWords(updatedWords);
+    } catch (error) {
+      console.error("Error fetching AI-generated answers:", error);
+    }
   };
 
-  const handleSave = () => {
-    localStorage.setItem("searchWords", JSON.stringify(searchWords));
-    localStorage.setItem("steps", JSON.stringify(steps));
-    localStorage.setItem("words", JSON.stringify(words));
-    onSave({ searchWords, steps, words });
-    onClose();
+  const useAIForSelected = async () => {
+    for (let index of selectedWords) {
+      await fetchAIAnswers(index);
+    }
   };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-      <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-4xl">
+      <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-4xl max-h-[90vh] overflow-y-auto">
         <h2 className="text-2xl font-bold mb-4 text-center">Game Configuration</h2>
 
         {/* Search Words Section */}
@@ -77,12 +87,16 @@ export const ConfigModal = ({ isOpen, onClose, onSave }) => {
               <input
                 type="text"
                 value={word}
-                onChange={(e) => handleSearchWordChange(index, e.target.value)}
+                onChange={(e) => {
+                  const updatedWords = [...searchWords];
+                  updatedWords[index] = e.target.value;
+                  setSearchWords(updatedWords);
+                }}
                 className="border p-2 flex-1 rounded-md"
               />
               {searchWords.length > 1 && (
                 <button
-                  onClick={() => removeSearchWord(index)}
+                  onClick={() => setSearchWords(searchWords.filter((_, i) => i !== index))}
                   className="ml-2 px-2 py-1 bg-red-500 text-white rounded-md"
                 >
                   ✖
@@ -90,7 +104,7 @@ export const ConfigModal = ({ isOpen, onClose, onSave }) => {
               )}
             </div>
           ))}
-          <button onClick={addSearchWord} className="mt-2 px-3 py-1 bg-blue-500 text-white rounded-md">
+          <button onClick={() => setSearchWords([...searchWords, ""])} className="mt-2 px-3 py-1 bg-blue-500 text-white rounded-md">
             + Add Search Word
           </button>
         </div>
@@ -101,68 +115,81 @@ export const ConfigModal = ({ isOpen, onClose, onSave }) => {
           <input
             type="number"
             value={steps}
-            onChange={(e) => handleStepsChange(Number(e.target.value))}
+            onChange={(e) => setSteps(Math.max(3, Math.min(15, Number(e.target.value))))}
             className="border p-2 rounded-md w-full"
           />
         </div>
 
+        {/* Select/Deselect, Add Word, Target Language */}
+        <div className="flex space-x-4 mb-4">
+          <button onClick={toggleSelectAll} className="px-3 py-1 bg-gray-500 text-white rounded-md">
+            {selectedWords.size === words.length ? "Deselect All" : "Select All"}
+          </button>
+          <button onClick={addNewWord} className="px-3 py-1 bg-blue-500 text-white rounded-md">
+            + Add Word
+          </button>
+
+          <div className="flex items-center space-x-4 mb-4">
+            <label htmlFor="targetLanguage" className="font-semibold self-center">
+              Target Language:
+            </label>
+            <select
+              id="targetLanguage"
+              value={targetLanguage}
+              onChange={(e) => setTargetLanguage(e.target.value)}
+              className="px-3 py-1 border rounded-md"
+            >
+              <option value="English (UK)">English (UK)</option>
+              <option value="Hebrew">Hebrew</option>
+              <option value="French">French</option>
+              <option value="Spanish">Spanish</option>
+              <option value="German">German</option>
+              <option value="Italian">Italian</option>
+              <option value="Chinese">Chinese</option>
+            </select>
+        </div>
+
+        </div>
+
         {/* Words Table */}
-        <div className="overflow-x-auto">
-          <table className="table-auto w-full border-collapse border border-gray-300">
-            <thead>
-              <tr className="bg-gray-200">
-                <th className="border p-2">Question</th>
-                <th className="border p-2">Correct</th>
-                <th className="border p-2">Related</th>
-                <th className="border p-2">Other 1</th>
-                <th className="border p-2">Other 2</th>
-                <th className="border p-2">Actions</th>
+        <div className="overflow-y-auto max-h-[300px] border border-gray-400 rounded-md">
+          <table className="table-auto w-full border-collapse">
+            <thead className="bg-gray-300 border border-gray-400">
+              <tr>
+                <th className="border border-gray-400 p-2">✔</th>
+                <th className="border border-gray-400 p-2">Question</th>
+                <th className="border border-gray-400 p-2">Correct</th>
+                <th className="border border-gray-400 p-2">Related</th>
+                <th className="border border-gray-400 p-2">Other 1</th>
+                <th className="border border-gray-400 p-2">Other 2</th>
+                <th className="border border-gray-400 p-2">Actions</th>
               </tr>
             </thead>
             <tbody>
               {words.map((word, index) => (
-                <tr key={index}>
+                <tr key={index} className="hover:bg-gray-100 border border-gray-400">
+                  <td className="border border-gray-400 p-2 text-center">
+                    <input type="checkbox" checked={selectedWords.has(index)} onChange={() => toggleSelect(index)} />
+                  </td>
                   {["question", "correct", "related", "other1", "other2"].map((key) => (
-                    <td key={key} className="border p-2">
-                      <input
-                        type="text"
-                        value={word[key]}
-                        onChange={(e) => handleWordChange(index, key, e.target.value)}
-                        className="w-full border rounded-md p-1"
-                      />
+                    <td key={key} className="border border-gray-400 p-2">
+                      <input type="text" value={word[key]} onChange={(e) => {
+                        const updated = [...words];
+                        updated[index][key] = e.target.value;
+                        setWords(updated);
+                      }} className="w-full border rounded-md p-1"/>
                     </td>
                   ))}
-                  <td className="border p-2 text-center">
-                    <button
-                      onClick={() => removeWord(index)}
-                      className="px-2 py-1 bg-red-500 text-white rounded-md hover:bg-red-600"
-                    >
-                      ✖
-                    </button>
-                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
 
-        {/* Add Word Button */}
-        <button
-          onClick={addWord}
-          className="w-full mt-4 bg-blue-500 text-white p-2 rounded-md font-semibold hover:bg-blue-600"
-        >
-          + Add Word
+        {/* Use AI Button */}
+        <button onClick={useAIForSelected} className="w-full mt-4 bg-purple-500 text-white p-2 rounded-md font-semibold">
+          Use AI
         </button>
-
-        {/* Save and Cancel */}
-        <div className="flex justify-end space-x-4 mt-4">
-          <button onClick={onClose} className="px-4 py-2 bg-gray-400 text-white rounded-md">
-            Cancel
-          </button>
-          <button onClick={handleSave} className="px-4 py-2 bg-green-500 text-white rounded-md">
-            Save
-          </button>
-        </div>
       </div>
     </div>
   );
