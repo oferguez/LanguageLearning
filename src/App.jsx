@@ -8,11 +8,6 @@ function App() {
   const [isConfigOpen, setIsConfigOpen] = useState(false);
   const [config, setConfig] = useState(() => RetrieveConfig());
 
-  // retrieve current config on startup
-  // useEffect(() => {
-  //   setConfig(() => RetrieveConfig());
-  // }, []);
-
   const startNewGame = () => {
     setStep(() => 1);
   };
@@ -31,6 +26,10 @@ function App() {
     setConfig(() => newConfig);
   }
 
+  const onExit = () => {
+    setStep(() => 0);
+  }
+  
   let game;
 
   if (step === 0) {
@@ -92,7 +91,7 @@ function App() {
     game = (
       <>
         <div className="min-h-screen bg-gradient-to-br from-pink-100/5 to-purple-100/5 p-4">
-          <GameBoard currentStep={step} totalSteps={config.steps} onStepComplete={handleStepComplete} words={config.words} />      
+          <GameBoard currentStep={step} totalSteps={config.steps} onStepComplete={handleStepComplete} onExit={onExit} words={config.words} />      
         </div>
         <UnicornReveal counter={step} steps={config.steps} searchWords={config.searchWords}/>
       </>  
