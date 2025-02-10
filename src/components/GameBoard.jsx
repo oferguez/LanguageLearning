@@ -40,8 +40,7 @@ const GameBoard = ({ currentStep, totalSteps, onStepComplete, onExit, words }) =
   };
 
   const playWinningAnimation = () => {
-    import('canvas-confetti').then(module => {
-      const confetti = module.default;
+    const confetti = require('canvas-confetti');
       const duration = 3000; // Animation duration in milliseconds
       const animationEnd = Date.now() + duration;
       const defaults = {
