@@ -75,15 +75,17 @@ const GameBoard = ({ currentStep, totalSteps, onStepComplete, words }) => {
           </p>
         </div>
 
-        <div className="flex justify-center items-center">
-          <button
-            onClick={() => alert("boo")}
-            className="p-4 text-lg rounded-xl transition-all transform hover:scale-105
-              bg-gradient-to-r from-pink-500 to-purple-500 text-white
-              shadow-lg hover:shadow-xl disabled:opacity-50"
-          >
-            Exit
-          </button>
+        <div className="grid grid-cols-2 gap-4 mt-6">
+          <div className="col-span-2">
+            <button
+              onClick={() => alert("boo")}
+              className="w-full p-4 text-lg rounded-xl transition-all transform hover:scale-105
+                bg-gradient-to-r from-pink-500 to-purple-500 text-white
+                shadow-lg hover:shadow-xl disabled:opacity-50"
+            >
+              Exit
+            </button>
+          </div>
         </div>
       </div>
 
