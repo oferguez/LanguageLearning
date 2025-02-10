@@ -62,7 +62,7 @@ const GameBoard = ({ currentStep, totalSteps, onStepComplete, words }) => {
                   onClick={() => handleAnswer(option)}
                   className="p-4 text-lg rounded-xl transition-all transform hover:scale-105
                         bg-gradient-to-r from-pink-500 to-purple-500 text-white
-                        shadow-lg hover:shadow-xl disabled:opacity-50"
+                        shadow-lg hover:shadow-xl disabled:opacity-50 min-w-[200px]"
                 >
                   {option}
                 </button>
@@ -75,16 +75,16 @@ const GameBoard = ({ currentStep, totalSteps, onStepComplete, words }) => {
           </p>
         </div>
 
-          <div className="mt-6 col-span-2">
-            <button
-              onClick={() => alert("boo")}
-              className="w-full p-4 text-lg rounded-xl transition-all transform hover:scale-105
-                bg-gradient-to-r from-pink-500 to-purple-500 text-white
-                shadow-lg hover:shadow-xl disabled:opacity-50"
-            >
-              Exit
-            </button>
-          </div>
+        <div className="mt-6 col-span-2 max-w-[calc(400px+1rem)] mx-auto w-full">
+          <button
+            onClick={() => alert("boo")}
+            className="w-full p-4 text-lg rounded-xl transition-all transform hover:scale-105
+              bg-gradient-to-r from-pink-500 to-purple-500 text-white
+              shadow-lg hover:shadow-xl disabled:opacity-50"
+          >
+            Exit
+          </button>
+        </div>
       </div>
       
     </div>
