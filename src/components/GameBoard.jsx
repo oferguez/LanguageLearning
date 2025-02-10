@@ -41,7 +41,7 @@ const GameBoard = ({ currentStep, totalSteps, onStepComplete, onExit, words }) =
 
   const playWinningAnimation = () => {
     const confetti = require('canvas-confetti');
-    const count = 200;
+    const count = 20;
     const defaults = {
       origin: { y: 0.7 },
       spread: 360,
