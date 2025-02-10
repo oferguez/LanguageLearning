@@ -40,48 +40,43 @@ const GameBoard = ({ currentStep, totalSteps, onStepComplete, onExit, words }) =
   };
 
   const playWinningAnimation = () => {
-    const confetti = require('canvas-confetti');
-    const count = 20;
-    const defaults = {
-      origin: { y: 0.7 },
-      spread: 360,
-      ticks: 50,
-      gravity: 0.8,
-      decay: 0.94,
-      startVelocity: 30,
-      shapes: ['star'],
-      colors: ['FFE400', 'FFBD00', 'E89400', 'FFCA6C', 'FDFFB8']
-    };
+    import('canvas-confetti').then(module => {
+      const confetti = module.default;
+      const duration = 3000; // Animation duration in milliseconds
+      const animationEnd = Date.now() + duration;
+      const defaults = {
+        startVelocity: 30,
+        spread: 360,
+        ticks: 60,
+        zIndex: 100,
+        particleCount: 50,
+        origin: { x: 0.5, y: 0.6 }
+      };
 
-    function fire(particleRatio, opts) {
-      confetti({
-        ...defaults,
-        ...opts,
-        particleCount: Math.floor(count * particleRatio)
-      });
-    }
+      function randomInRange(min, max) {
+        return Math.random() * (max - min) + min;
+      }
 
-    fire(0.25, {
-      spread: 26,
-      startVelocity: 55,
-    });
-    fire(0.2, {
-      spread: 60,
-    });
-    fire(0.35, {
-      spread: 100,
-      decay: 0.91,
-      scalar: 0.8
-    });
-    fire(0.1, {
-      spread: 120,
-      startVelocity: 25,
-      decay: 0.92,
-      scalar: 1.2
-    });
-    fire(0.1, {
-      spread: 120,
-      startVelocity: 45,
+      const interval = setInterval(() => {
+        const timeLeft = animationEnd - Date.now();
+
+        if (timeLeft <= 0) {
+          return clearInterval(interval);
+        }
+
+        const particleCount = 50 * (timeLeft / duration);
+        
+        confetti({
+          ...defaults,
+          particleCount,
+          origin: { x: randomInRange(0.1, 0.9), y: Math.random() - 0.2 },
+          colors: ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff'],
+          shapes: ['circle', 'square'],
+          gravity: 1.5,
+          scalar: 2,
+          drift: 0
+        });
+      }, 250);
     });
   };
 
