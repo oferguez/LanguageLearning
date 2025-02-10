@@ -38,7 +38,7 @@ export const ConfigModal = ({ isOpen, onClose, onSave }) => {
   const addNewWord = () => {
     setWords((prevWords) => {
       const updatedWords = [...prevWords, { question: "", correct: "", related: "", other1: "", other2: "" }];
-      
+
       // Scroll to the bottom after updating the words
       setTimeout(() => {
         const tableContainer = document.querySelector(".scrollable-table");
@@ -98,22 +98,22 @@ export const ConfigModal = ({ isOpen, onClose, onSave }) => {
         </div>
 
         {/* Button Row */}
-        <div className="flex items-center space-x-4 mb-4">
-          <button onClick={toggleSelectAll} className="px-3 py-1 bg-blue-500 text-white rounded-md">
+        <div className="flex items-center space-x-4 mb-4">       
+          <button onClick={toggleSelectAll} className="px-3 py-1 bg-blue-500 text-white rounded-md whitespace-nowrap">
             {selectedWords.size === words.length ? "Deselect All" : "Select All"}
           </button>
-          <button onClick={addNewWord} className="px-3 py-1 bg-blue-500 text-white rounded-md">
+          <button onClick={addNewWord} className="px-3 py-1 bg-blue-500 text-white rounded-md whitespace-nowrap">
             + Add Word
           </button>
           <div className="flex items-center space-x-2">
-            <label htmlFor="targetLanguage" className="font-semibold">
+            <label htmlFor="targetLanguage" className="font-semibold whitespace-nowrap" >
               Target Language:
             </label>
             <select
               id="targetLanguage"
               value={targetLanguage}
               onChange={(e) => setTargetLanguage(e.target.value)}
-              className="px-3 py-1 border rounded-md"
+              className="px-3 py-1 border rounded-md whitespace-nowrap"
             >
               <option value="English (UK)">English (UK)</option>
               <option value="Hebrew">Hebrew</option>
@@ -125,14 +125,13 @@ export const ConfigModal = ({ isOpen, onClose, onSave }) => {
             </select>
           </div>
 
-          {/* Use AI Button */}
+          {/* Use AI Button (Justified to Right, Takes Remaining Space) */}
           <button
             onClick={() => console.log("Use AI called")}
-            className="px-3 py-1 bg-blue-500 text-white rounded-md"
+            className="px-3 py-1 bg-blue-500 text-white rounded-md ml-auto w-full"
           >
             AI Auto Suggest
           </button>
-
         </div>
 
         {/* Words Table */}
@@ -156,7 +155,7 @@ export const ConfigModal = ({ isOpen, onClose, onSave }) => {
                   </td>
                   {["question", "correct", "related", "other1", "other2"].map((key) => (
                     <td key={key} className="border border-gray-400 p-2">
-                      <input type="text" value={word[key]} className="w-full border rounded-md p-1"/>
+                      <input type="text" value={word[key]} className="w-full border rounded-md p-1" />
                     </td>
                   ))}
                 </tr>
