@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { words as defaultWords } from "../data/words.js";
+import getTranslatedWords from "../service/translationAiFetcher.js";
 
 const loadFromStorage = (key, defaultValue) => {
   const storedValue = localStorage.getItem(key);
@@ -50,6 +51,45 @@ export const ConfigModal = ({ isOpen, onClose, onSave }) => {
       return updatedWords;
     });
   };
+
+  const handleWordChanged = (e, index, key) => {
+    setWords(prevWords => {
+      const newValue = e.target.value;
+      const updatedWords = [...prevWords];
+      updatedWords[index] = { ...updatedWords[index], [key]: newValue };
+      return updatedWords;
+    });
+  };
+  
+  const OnAiAutoSuggest = () => {
+    const sources = Array.from(selectedWords).map((index) => words[index].question);
+    getTranslatedWords(sources, "English", targetLanguage).then((translatedWords) => {
+      setWords((prevWords) => {
+        const updatedWords = [...prevWords];
+        translatedWords.forEach((translatedWord, i) => {
+          const targetWord = updatedWords.find(obj => obj.question === translatedWord.word);
+          if (targetWord) {
+            // Modify properties
+            targetWord.answer = translatedWord.answer;
+            targetWord.related = translatedWord.related;
+            targetWord.unrelated_1 = translatedWord.unrelated_1;
+            targetWord.unrelated_2 = translatedWord.unrelated_2;
+          }
+          else {
+            updatedWords.push({
+              word: translatedWord.word,
+              answer: translatedWord.answer,
+              related: translatedWord.related,
+              unrelated_1: translatedWord.unrelated_1,
+              unrelated_2: translatedWord.unrelated_2
+            });
+          }
+        });
+        return updatedWords;
+      });
+    });
+  };
+
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
@@ -127,7 +167,7 @@ export const ConfigModal = ({ isOpen, onClose, onSave }) => {
 
           {/* Use AI Button (Justified to Right, Takes Remaining Space) */}
           <button
-            onClick={() => console.log("Use AI called")}
+            onClick={() => OnAiAutoSuggest()}
             className="px-3 py-1 bg-blue-500 text-white rounded-md ml-auto w-full"
           >
             AI Auto Suggest
@@ -155,7 +195,7 @@ export const ConfigModal = ({ isOpen, onClose, onSave }) => {
                   </td>
                   {["question", "correct", "related", "other1", "other2"].map((key) => (
                     <td key={key} className="border border-gray-400 p-2">
-                      <input type="text" value={word[key]} className="w-full border rounded-md p-1" />
+                      <input type="text" value={word[key]} onChange={(e)=>handleWordChanged(e, index, key)} className="w-full border rounded-md p-1" />
                     </td>
                   ))}
                 </tr>

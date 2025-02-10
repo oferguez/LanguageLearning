@@ -1,4 +1,4 @@
-import { apikey } from "../data/apikey.js";
+import { apikey } from "../data/apiKeyUnsplash.js";
 import backupPhoto from '../data/photo.jpg';
 export const IMAGE_KEY = "unicorn_image";
 
