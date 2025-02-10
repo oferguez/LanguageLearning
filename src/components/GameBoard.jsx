@@ -75,8 +75,7 @@ const GameBoard = ({ currentStep, totalSteps, onStepComplete, words }) => {
           </p>
         </div>
 
-        <div className="grid grid-cols-2 gap-4 mt-6">
-          <div className="col-span-2">
+          <div className="mt-6 col-span-2">
             <button
               onClick={() => alert("boo")}
               className="w-full p-4 text-lg rounded-xl transition-all transform hover:scale-105
@@ -86,9 +85,7 @@ const GameBoard = ({ currentStep, totalSteps, onStepComplete, words }) => {
               Exit
             </button>
           </div>
-        </div>
       </div>
-
       
     </div>
   );
