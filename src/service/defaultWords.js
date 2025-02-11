@@ -6,10 +6,10 @@ export default async function fetchCSV(file) {
 
 function csvToJSON(csv) {
     const lines = csv.trim().split("\n");
-    const headers = lines[0].split(",");
+    const headers = lines[0].split(/['\r', ',']/);
 
     return lines.slice(1).map(line => {
-        const values = line.split(",");
+        const values = line.split(/['\r', ',']/);
         return headers.reduce((obj, key, index) => {
             obj[key] = values[index];
             return obj;
