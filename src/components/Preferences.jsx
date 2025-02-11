@@ -1,27 +1,62 @@
-import React, { useState } from "react";
-import { words as defaultWords } from "../data/words.js";
+import React, { useState, useEffect } from "react";
 import getTranslatedWords from "../service/translationAiFetcher.js";
+import fetchCSV from '../service/defaultWords.js';
 
+function isValidObject(obj) {
+  if (obj === undefined) {
+    return false;
+  }
+  if (obj === null) {
+    return false;
+  }
+
+  if ( typeof obj === "object" ) {
+    return Object.keys(obj).length > 0;
+  }
+
+  if ( Array.isArray(obj) ) {
+    return obj.length > 0;
+  }
+
+  return true;
+}
+ 
 const loadFromStorage = (key, defaultValue) => {
-  const storedValue = localStorage.getItem(key);
-  return storedValue ? JSON.parse(storedValue) : defaultValue;
+  try {
+    const storedValue = localStorage.getItem(key);
+    return storedValue ? JSON.parse(storedValue) : defaultValue;
+  } catch (error) {
+    console.error(`Error loading from storage: ${key}`, error);
+    return defaultValue;
+  }
 };
 
 export const RetrieveConfig = () => ({
   searchWords: loadFromStorage("searchWords", ["unicorn"]),
   steps: loadFromStorage("steps", 5),
-  words: loadFromStorage("words", defaultWords),
+  words: loadFromStorage("words", null)
 });
 
 export const ConfigModal = ({ isOpen, onClose, onSave }) => {
-  if (!isOpen) return null;
-
   const [searchWords, setSearchWords] = useState(loadFromStorage("searchWords", ["unicorn"]));
   const [steps, setSteps] = useState(loadFromStorage("steps", 5));
-  const [words, setWords] = useState(loadFromStorage("words", defaultWords));
+  const [words, setWords] = useState(loadFromStorage("words", []));
   const [selectedWords, setSelectedWords] = useState(new Set());
   const [targetLanguage, setTargetLanguage] = useState("English (UK)");
-
+  const [isAiLoading, setIsAiLoading] = useState(false);
+  
+  useEffect(() => {
+    async function loadCSV() {
+      const data = await fetchCSV("/words.csv"); 
+      if (data.length > 0) {
+        setWords( (prev) => {
+          return [...data];  
+        })   
+      }
+    }
+    loadCSV();
+  }, []); 
+  
   const toggleSelectAll = () => {
     if (selectedWords.size === words.length) {
       setSelectedWords(new Set());
@@ -60,38 +95,48 @@ export const ConfigModal = ({ isOpen, onClose, onSave }) => {
       return updatedWords;
     });
   };
-  
+
   const OnAiAutoSuggest = () => {
     const sources = Array.from(selectedWords).map((index) => words[index].question);
-    getTranslatedWords(sources, "English", targetLanguage).then((translatedWords) => {
+    setIsAiLoading(true);
+    getTranslatedWords(sources, targetLanguage).then((translatedWords) => {
       setWords((prevWords) => {
         const updatedWords = [...prevWords];
-        translatedWords.forEach((translatedWord, i) => {
-          const targetWord = updatedWords.find(obj => obj.question === translatedWord.word);
+        translatedWords.forEach((translatedWord, _) => {
+          const targetWord = updatedWords.find(obj => obj.question === translatedWord.question);
           if (targetWord) {
             // Modify properties
-            targetWord.answer = translatedWord.answer;
+            targetWord.correct = translatedWord.correct;
             targetWord.related = translatedWord.related;
-            targetWord.unrelated_1 = translatedWord.unrelated_1;
-            targetWord.unrelated_2 = translatedWord.unrelated_2;
+            targetWord.other1 = translatedWord.other1;
+            targetWord.other2 = translatedWord.other2;
           }
           else {
             updatedWords.push({
-              word: translatedWord.word,
-              answer: translatedWord.answer,
+              question: translatedWord.question,
+              correct: translatedWord.correct,
               related: translatedWord.related,
-              unrelated_1: translatedWord.unrelated_1,
-              unrelated_2: translatedWord.unrelated_2
+              other1: translatedWord.other1,
+              other2: translatedWord.other2
             });
           }
         });
         return updatedWords;
       });
+      setIsAiLoading(false);
     });
   };
 
+  const deleteSelected = () => {
+    setWords((prevWords) => {
+      const updatedWords = prevWords.filter((_, i) => !selectedWords.has(i));
+      setSelectedWords(new Set());
+      return updatedWords;
+    });
+  }
 
-  return (
+  return isOpen && (
+    
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
       <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-4xl max-h-[90vh] overflow-y-auto">
         <h2 className="text-2xl font-bold mb-4 text-center">Game Configuration</h2>
@@ -99,7 +144,7 @@ export const ConfigModal = ({ isOpen, onClose, onSave }) => {
         {/* Search Words Section */}
         <div className="mb-4">
           <label className="font-semibold block mb-2">Search Words</label>
-          {searchWords.map((word, index) => (
+          {isValidObject(searchWords) && searchWords.map((word, index) => (
             <div key={index} className="flex items-center mb-2">
               <input
                 type="text"
@@ -138,12 +183,20 @@ export const ConfigModal = ({ isOpen, onClose, onSave }) => {
         </div>
 
         {/* Button Row */}
-        <div className="flex items-center space-x-4 mb-4">       
+        <div className="flex items-center space-x-4 mb-4">
           <button onClick={toggleSelectAll} className="px-3 py-1 bg-blue-500 text-white rounded-md whitespace-nowrap">
             {selectedWords.size === words.length ? "Deselect All" : "Select All"}
           </button>
           <button onClick={addNewWord} className="px-3 py-1 bg-blue-500 text-white rounded-md whitespace-nowrap">
             + Add Word
+          </button>
+          <button
+            disabled={selectedWords.size === 0}
+            onClick={deleteSelected}
+            className={selectedWords.size === 0 ?
+              "px-3 py-1 bg-gray-400 text-white rounded-md whitespace-nowrap" :
+              "px-3 py-1 bg-blue-500 text-white rounded-md whitespace-nowrap"}>
+            ✖ Delete
           </button>
           <div className="flex items-center space-x-2">
             <label htmlFor="targetLanguage" className="font-semibold whitespace-nowrap" >
@@ -167,10 +220,11 @@ export const ConfigModal = ({ isOpen, onClose, onSave }) => {
 
           {/* Use AI Button (Justified to Right, Takes Remaining Space) */}
           <button
+            disabled={selectedWords.size === 0 || isAiLoading}
             onClick={() => OnAiAutoSuggest()}
-            className="px-3 py-1 bg-blue-500 text-white rounded-md ml-auto w-full"
+            className={`px-4 py-2 rounded-md text-white ${(isAiLoading || selectedWords.size === 0) ? "bg-gray-400 cursor-not-allowed" : "bg-blue-500 hover:bg-blue-600"}`}
           >
-            AI Auto Suggest
+            {isAiLoading ? "⏳ Processing..." : "AI Auto Suggest"}
           </button>
         </div>
 
@@ -188,14 +242,14 @@ export const ConfigModal = ({ isOpen, onClose, onSave }) => {
               </tr>
             </thead>
             <tbody>
-              {words.map((word, index) => (
+              {isValidObject(words) && words.map((word, index) => (
                 <tr key={index} className="hover:bg-gray-100 border border-gray-400">
                   <td className="border border-gray-400 p-2 text-center">
                     <input type="checkbox" checked={selectedWords.has(index)} onChange={() => toggleSelect(index)} />
                   </td>
                   {["question", "correct", "related", "other1", "other2"].map((key) => (
                     <td key={key} className="border border-gray-400 p-2">
-                      <input type="text" value={word[key]} onChange={(e)=>handleWordChanged(e, index, key)} className="w-full border rounded-md p-1" />
+                      <input type="text" value={word[key]} onChange={(e) => handleWordChanged(e, index, key)} className="w-full border rounded-md p-1" />
                     </td>
                   ))}
                 </tr>
@@ -210,6 +264,6 @@ export const ConfigModal = ({ isOpen, onClose, onSave }) => {
           <button onClick={() => onSave({ searchWords, steps, words })} className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600">Save</button>
         </div>
       </div>
-    </div>
+    </div >
   );
 };

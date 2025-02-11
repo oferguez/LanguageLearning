@@ -5,7 +5,7 @@ const openai = new OpenAI({
     apiKey: apikey, dangerouslyAllowBrowser: true
   });
   
-export default async function getTranslatedWords(words, sourceLanguage, targetLanguage) {
+export default async function getTranslatedWords(words, targetLanguage) {
     if (!words || words.length === 0) {
         throw new Error("Words list cannot be empty.");
     }
@@ -15,30 +15,30 @@ export default async function getTranslatedWords(words, sourceLanguage, targetLa
 
     Given:
     - A list of words: ${JSON.stringify(words)}
-    - Source Language: ${sourceLanguage}
+    - Source Language: you need to detect source languange from the words
     - Target Language: ${targetLanguage}
 
     For each word w_i:
-    1. **answer_i** → The **exact translation** of w_i into the target language. When target language equals source language, provide the best synonym you can find.
+    1. **correct_i** → The **exact translation** of w_i into the target language. When target language equals source language, provide the best synonym you can find.
     2. **related_i** → A **related but incorrect translation**, meaning it is connected to w_i but is NOT the correct translation.
-    3. **unrelated_i1** and **unrelated_i2** → Two **funny words** in the target language that are completely **unrelated** to w_i.
+    3. **other_i1** and **other_i2** → Two **funny words** in the target language that are completely **unrelated** to w_i.
 
     Return the output as a structured list of objects in JSON format:
     \`\`\`json
     [
-    {
+    {   
         "question": "w_1",
-        "answer": "exact_translation_1",
+        "correct": "exact_translation_1",
         "related": "related_but_incorrect_1",
-        "unrelated_1": "funny_unrelated_word_1",
-        "unrelated_2": "funny_unrelated_word_2"
+        "other1": "funny_unrelated_word_1",
+        "other2": "funny_unrelated_word_2"
     },
     {
         "question": "w_2",
-        "answer": "exact_translation_2",
+        "correct": "exact_translation_2",
         "related": "related_but_incorrect_2",
-        "unrelated_1": "funny_unrelated_word_3",
-        "unrelated_2": "funny_unrelated_word_4"
+        "other1": "funny_unrelated_word_3",
+        "other2": "funny_unrelated_word_4"
     }
     ]
     \`\`\`
@@ -69,13 +69,3 @@ export default async function getTranslatedWords(words, sourceLanguage, targetLa
         return [];
     }
 }
-
-// Example usage:
-// (async () => {
-//     const words = ["cat", "apple", "car"];
-//     const sourceLanguage = "English";
-//     const targetLanguage = "French";
-
-//     const result = await getTranslatedWords(words, sourceLanguage, targetLanguage);
-//     console.log(result);
-// })();

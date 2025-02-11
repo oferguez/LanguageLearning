@@ -24,6 +24,8 @@ function App() {
 
   const onSaveConfig = (newConfig) => {
     setConfig(() => newConfig);
+
+    setIsConfigOpen(false);
   }
 
   const onExit = () => {
