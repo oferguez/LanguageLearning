@@ -31,6 +31,12 @@ const loadFromStorage = (key, defaultValue) => {
   }
 };
 
+export const SaveConfig = ({searchWords, steps, words}) => {
+  localStorage.setItem("searchWords", JSON.stringify(searchWords));
+  localStorage.setItem("steps", JSON.stringify(steps));
+  localStorage.setItem("words", JSON.stringify(words));
+}
+
 export const RetrieveConfig = () => ({
   searchWords: loadFromStorage("searchWords", ["unicorn"]),
   steps: loadFromStorage("steps", 5),

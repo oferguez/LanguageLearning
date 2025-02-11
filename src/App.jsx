@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import UnicornReveal from './components/UnicornReveal';
 import GameBoard from './components/GameBoard';
-import {ConfigModal, RetrieveConfig} from './components/Preferences';
+import {ConfigModal, RetrieveConfig, SaveConfig} from './components/Preferences';
 
 function App() {
   const [step, setStep] = useState(0);
@@ -24,7 +24,7 @@ function App() {
 
   const onSaveConfig = (newConfig) => {
     setConfig(() => newConfig);
-
+    SaveConfig(newConfig);
     setIsConfigOpen(false);
   }
 
