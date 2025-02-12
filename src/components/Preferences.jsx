@@ -53,7 +53,10 @@ export const ConfigModal = ({ isOpen, onClose, onSave }) => {
   
   useEffect(() => {
     async function loadCSV() {
-      const data = await fetchCSV("/words.csv"); 
+
+      const csvFilePath = `${import.meta.env.BASE_URL}words.csv`;
+      const data = await fetchCSV(csvFilePath)
+        .catch(error => console.error("Error loading CSV:", error));
       if (data.length > 0) {
         setWords( (prev) => {
           return [...data];  
