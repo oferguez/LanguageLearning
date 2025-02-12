@@ -43,6 +43,16 @@ jobs:
       - name: 🔧 Build Project
         run: npm run build
 
+      - name: 🛠️ Debug Check GitHub Token
+        run: |
+          if [[ -z "${{ secrets.GITHUB_TOKEN }}" ]]; then
+            echo "❌ GITHUB_TOKEN is NOT set!"
+            exit 1
+          else
+            echo "✅ GITHUB_TOKEN exists and is set!"
+          fi
+      
+
       - name: 🚀 Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
@@ -50,3 +60,4 @@ jobs:
           publish_dir: ./dist  # Change to "build" if using Create React App
           allow_empty_commit: true  # ✅ Prevents errors if nothing changed
           force_orphan: true  # ✅ Forces a new `gh-pages` branch without history
+          keep_files: true      # ✅ Keeps existing files in gh-pages branch
