@@ -4,6 +4,13 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch to execute the workflow on'
+        required: true
+        default: 'main'
+    
 
 permissions:
   contents: write  # Required to push to gh-pages branch
