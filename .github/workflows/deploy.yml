@@ -30,9 +30,9 @@ jobs:
           echo "VITE_OPENAI_API_KEY=${{ secrets.VITE_OPENAI_API_KEY }}" >> .env
           echo "VITE_UNSPLASH_API_KEY=${{ secrets.VITE_UNSPLASH_API_KEY }}" >> .env
 
-      - name: witw
-        run: echo ${{ secrets }}
-        
+      - name: 🛠️ Print All Environment Variables
+        run: env
+                
       - name: 📦 Install Dependencies
         run: npm install
 
