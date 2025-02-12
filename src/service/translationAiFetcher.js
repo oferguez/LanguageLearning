@@ -1,8 +1,8 @@
 import OpenAI from "openai";
-import { apikey } from "../data/apiKeyOpenAI.js";
+const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
 
 const openai = new OpenAI({
-    apiKey: apikey, dangerouslyAllowBrowser: true
+    apiKey: apiKey, dangerouslyAllowBrowser: true
   });
   
 export default async function getTranslatedWords(words, targetLanguage) {

@@ -1,5 +1,4 @@
-apikey*.js
-keys.txt
+.env
 # Logs
 logs
 *.log

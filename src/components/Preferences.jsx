@@ -60,7 +60,10 @@ export const ConfigModal = ({ isOpen, onClose, onSave }) => {
         })   
       }
     }
-    loadCSV();
+
+    if (!isValidObject(words)) {
+      loadCSV();
+    }
   }, []); 
   
   const toggleSelectAll = () => {

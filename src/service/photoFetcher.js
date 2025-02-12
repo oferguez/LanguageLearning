@@ -1,4 +1,5 @@
-import { apikey } from "../data/apiKeyUnsplash.js";
+const apiKey = import.meta.env.VITE_UNSPLASH_API_KEY;
+
 import backupPhoto from '../data/photo.jpg';
 export const IMAGE_KEY = "unicorn_image";
 
@@ -29,7 +30,7 @@ export async function fetchCropAndSaveImage(searchWords) {
 
 async function downloadRandomImage(searchWords) {
   const queryString = searchWords.join(",");
-  const response1 = await fetch(`https://api.unsplash.com/photos/random?query=${queryString}&client_id=${apikey}`);
+  const response1 = await fetch(`https://api.unsplash.com/photos/random?query=${queryString}&client_id=${apiKey}`);
   const jsonData = await response1.json();
   const photoUrl = jsonData.urls.regular; 
   const response2 = await fetch(photoUrl);
