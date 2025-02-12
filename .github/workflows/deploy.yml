@@ -36,12 +36,6 @@ jobs:
       - name: 🔧 Build Project
         run: npm run build
 
-      - name: 🛠️ Print All Environment Variables
-        run: env
-
-      - name: 🛠️ list files
-        run: ls -alR
-
       - name: 🚀 Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
