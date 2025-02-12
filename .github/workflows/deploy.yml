@@ -41,3 +41,5 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist  # Change to "build" if using Create React App
+          allow_empty_commit: true  # ✅ Prevents errors if nothing changed
+          force_orphan: true  # ✅ Forces a new `gh-pages` branch without history
