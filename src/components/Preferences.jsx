@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
-import getTranslatedWords from "../service/translationAiFetcher.js";
+//import getTranslatedWords from "../service/translationAiFetcher.js";
+import getTranslatedWords from "../service/translate.js";
+
 import fetchCSV from '../service/defaultWords.js';
 
 function isValidObject(obj) {

@@ -1,0 +1,13 @@
+[build]
+  functions = "netlify/functions"
+
+[dev]
+  functions = "netlify/functions"
+  command = "npm run dev"
+  targetPort = 5173         # Tell Netlify Dev to proxy frontend requests to Vite
+  port = 8888               # Run Netlify Dev on port 8888 (serves functions here)
+
+[functions]
+  included_files = ["netlify/functions/time.js"]
+
+
