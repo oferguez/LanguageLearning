@@ -64,7 +64,8 @@ function App() {
         <div className="min-h-screen bg-gradient-to-br from-pink-100 to-purple-100 flex items-center justify-center p-4">
           <div className="text-center">
             <h1 className="text-4xl md:text-6xl font-bold text-purple-600 mb-8">
-              Language Learning Adventure!
+              <p className='text-8xl'>Shira's</p>
+              <p>Language Learning Adventure!</p>
             </h1>
             <button
               onClick={startNewGame}
