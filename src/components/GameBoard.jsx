@@ -7,6 +7,8 @@ const GameBoard = ({ currentStep, totalSteps, onStepComplete, onExit, words }) =
     currentStep,
     "totalSteps=",
     totalSteps,
+    "words=",
+    typeof words === "undefined" ? "undefined" : words === null ? "null" : words.length
   );
 
   const [gameWords, setGameWords] = useState([]);

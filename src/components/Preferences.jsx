@@ -39,22 +39,48 @@ export const SaveConfig = ({searchWords, steps, words}) => {
   localStorage.setItem("words", JSON.stringify(words));
 }
 
-export const RetrieveConfig = () => ({
-  searchWords: loadFromStorage("searchWords", ["unicorn"]),
-  steps: loadFromStorage("steps", 5),
-  words: loadFromStorage("words", null)
-});
+export const RetrieveConfig = () => {
+  console.log('RetrieveConfigAsync called');
+
+  async function loadCsvAsync() {
+    const csvFilePath = `${import.meta.env.BASE_URL}words.csv`;
+    const data = await fetchCSV(csvFilePath)
+      .catch(error => console.error("Error loading CSV:", error));
+    console.log(`fetched ${data.length} words from ${csvFilePath}`)
+    return [...data];
+  }
+
+  return loadCsvAsync().then(words => { // Handle promise with .then()
+    let r = {
+      searchWords: loadFromStorage("searchWords", ["unicorn"]),
+      steps: loadFromStorage("steps", 5),
+      words: loadFromStorage("words", words) // Now words is resolved
+    };
+    console.log('RetrieveConfigAsync: loadCsvAsync completed');
+    console.dir(r);
+    return r;
+  });
+};
 
 export const ConfigModal = ({ isOpen, onClose, onSave }) => {
   const [searchWords, setSearchWords] = useState(loadFromStorage("searchWords", ["unicorn"]));
   const [steps, setSteps] = useState(loadFromStorage("steps", 5));
-  const [words, setWords] = useState(loadFromStorage("words", []));
-  const [selectedWords, setSelectedWords] = useState(new Set());
   const [targetLanguage, setTargetLanguage] = useState("English (UK)");
-  const [isAiLoading, setIsAiLoading] = useState(false);
+  const [words, setWords] = useState(loadFromStorage("words", []));
   
+  const [selectedWords, setSelectedWords] = useState(new Set());
+  const [isAiLoading, setIsAiLoading] = useState(false);
+
+  async function loadCSV() {
+
+    const csvFilePath = `${import.meta.env.BASE_URL}words.csv`;
+    const data = await fetchCSV(csvFilePath)
+      .catch(error => console.error("Error loading CSV:", error));
+    return [...data];  
+  }
+
   useEffect(() => {
-    async function loadCSV() {
+    async function iLoadCSV() {
 
       const csvFilePath = `${import.meta.env.BASE_URL}words.csv`;
       const data = await fetchCSV(csvFilePath)
@@ -66,7 +92,7 @@ export const ConfigModal = ({ isOpen, onClose, onSave }) => {
       }
     }
 
-    loadCSV();
+    iLoadCSV();
     // if (!isValidObject(words)) {
     //   loadCSV();
     // }

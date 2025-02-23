@@ -4,10 +4,33 @@ import GameBoard from './components/GameBoard';
 import {ConfigModal, RetrieveConfig, SaveConfig} from './components/Preferences';
 
 function App() {
+  console.log('APP: Start');
+
   const [step, setStep] = useState(0);
   const [isConfigOpen, setIsConfigOpen] = useState(false);
-  const [config, setConfig] = useState(() => RetrieveConfig());
+  const [config, setConfig] = useState(null);
 
+  useEffect(() => {
+    console.log('APP: useEffect 1');
+    setIsConfigOpen(false);
+    try {
+      RetrieveConfig().then((retrievedConfig) => {
+        console.log('APP: useEffect 2: ', 
+          typeof retrievedConfig === "undefined" ? "undefined" : retrievedConfig === null ? "null" : JSON.stringify(retrievedConfig)
+        );
+
+        if (retrievedConfig) {
+          setConfig(retrievedConfig);
+        }
+
+        console.log(retrievedConfig);
+      });
+      console.log('APP: useEffect 3');
+    } catch (error) {
+      console.error('APP: useEffect: error:', error); 
+    } 
+  }, []);
+  
   const startNewGame = () => {
     setStep(() => 1);
   };
@@ -36,7 +59,7 @@ function App() {
 
   if (step === 0) {
     console.log('APP: Init: step is 0');
-    game = (
+    game = config && (
       <>
         <div className="min-h-screen bg-gradient-to-br from-pink-100 to-purple-100 flex items-center justify-center p-4">
           <div className="text-center">
