@@ -1,7 +1,5 @@
-// WIP: This is a placeholder for the actual translation API fetcher function
-
 export default async function fetchTranslation(words, targetLanguage) {
-    const url = "/.netlify/functions/your-function-name"; // Update with actual function name
+    const url = "https://oferguez.netlify.app/.netlify/functions/ai-translation-fetcher";
 
     try {
         const response = await fetch(url, {
