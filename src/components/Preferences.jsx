@@ -3,6 +3,10 @@ import getTranslatedWords from "../service/translationAiFetcher.js";
 
 import fetchCSV from '../service/defaultWords.js';
 
+function onTranslationChunkReceived(wordsReceived, wordsTotal) {
+  console.log(`Received ${wordsReceived} of ${wordsTotal} words`);
+}
+
 function isValidObject(obj) {
   if (obj === undefined) {
     return false;
@@ -139,7 +143,7 @@ export const ConfigModal = ({ isOpen, onClose, onSave }) => {
   const OnAiAutoSuggest = () => {
     const sources = Array.from(selectedWords).map((index) => words[index].question);
     setIsAiLoading(true);
-    getTranslatedWords(sources, targetLanguage).then((translatedWords) => {
+    getTranslatedWords(sources, targetLanguage, onTranslationChunkReceived).then((translatedWords) => {
       setWords((prevWords) => {
         const updatedWords = [...prevWords];
         translatedWords.forEach((translatedWord, _) => {
