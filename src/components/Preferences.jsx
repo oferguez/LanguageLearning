@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
-//import getTranslatedWords from "../service/translationAiFetcher.js";
-import getTranslatedWords from "../service/translate.js";
+import getTranslatedWords from "../service/translationAiFetcher.js";
 
 import fetchCSV from '../service/defaultWords.js';
 
