@@ -1,11 +1,8 @@
 import React, { useState, useEffect } from "react";
-import getTranslatedWords from "../service/translationAiFetcher.js";
+import fetchTranslatedWords from "../service/translationAiFetcher.js";
+import ProgressBar from "./ProgressBar.jsx";
 
 import fetchCSV from '../service/defaultWords.js';
-
-function onTranslationChunkReceived(wordsReceived, wordsTotal) {
-  console.log(`Received ${wordsReceived} of ${wordsTotal} words`);
-}
 
 function isValidObject(obj) {
   if (obj === undefined) {
@@ -73,6 +70,8 @@ export const ConfigModal = ({ isOpen, onClose, onSave }) => {
   
   const [selectedWords, setSelectedWords] = useState(new Set());
   const [isAiLoading, setIsAiLoading] = useState(false);
+  const [translatedWords, setTranslatedWords] = useState(0);
+  const [wordsTotal, setWordsTotal] = useState(0);
 
   async function loadCSV() {
 
@@ -101,6 +100,13 @@ export const ConfigModal = ({ isOpen, onClose, onSave }) => {
     // }
   }, []); 
   
+  function onTranslationChunkReceived(wordsReceived, wordsTotal) {
+    console.log(`Received ${wordsReceived} of ${wordsTotal} words`);
+    setTranslatedWords(wordsReceived);
+    setWordsTotal(wordsTotal);
+  }
+
+
   const toggleSelectAll = () => {
     if (selectedWords.size === words.length) {
       setSelectedWords(new Set());
@@ -143,7 +149,7 @@ export const ConfigModal = ({ isOpen, onClose, onSave }) => {
   const OnAiAutoSuggest = () => {
     const sources = Array.from(selectedWords).map((index) => words[index].question);
     setIsAiLoading(true);
-    getTranslatedWords(sources, targetLanguage, onTranslationChunkReceived).then((translatedWords) => {
+    fetchTranslatedWords(sources, targetLanguage, onTranslationChunkReceived, 2).then((translatedWords) => {
       setWords((prevWords) => {
         const updatedWords = [...prevWords];
         translatedWords.forEach((translatedWord, _) => {
@@ -221,7 +227,7 @@ export const ConfigModal = ({ isOpen, onClose, onSave }) => {
           <input
             type="number"
             value={steps}
-            onChange={(e) => setSteps(Math.max(3, Math.min(15, Number(e.target.value))))}
+            onChange={(e) => setSteps(Math.max(5, Math.min(15, Number(e.target.value))))}
             className="border p-2 rounded-md w-full"
           />
         </div>
@@ -270,6 +276,9 @@ export const ConfigModal = ({ isOpen, onClose, onSave }) => {
           >
             {isAiLoading ? "⏳ Processing..." : "AI Auto Suggest"}
           </button>
+        </div>
+        <div>
+          {isAiLoading && <ProgressBar wordsReceived={translatedWords} wordsTotal={wordsTotal} />}
         </div>
 
         {/* Words Table */}
