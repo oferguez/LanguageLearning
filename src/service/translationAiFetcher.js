@@ -15,14 +15,13 @@ export default async function fetchTranslation(words, targetLanguage, onChunkRec
                 body: JSON.stringify({ words: chunk, targetLanguage }),
             });
 
-            onChunkReceived(i + chunkSize, words.length);
-
             if (!response.ok) {
                 throw new Error(`Server error: ${response.statusText}`);
             }
 
             const result = await response.json();
             results.push(...result);
+            onChunkReceived(i + result.length, words.length);
         } catch (error) {
             console.error("Translation API error:", error);
             return { error: "Failed to fetch translations" };

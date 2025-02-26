@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import fetchTranslatedWords from "../service/translationAiFetcher.js";
 import ProgressBar from "./ProgressBar.jsx";
-
 import fetchCSV from '../service/defaultWords.js';
+
+const chunkSize = 2;
 
 function isValidObject(obj) {
   if (obj === undefined) {
@@ -149,7 +150,7 @@ export const ConfigModal = ({ isOpen, onClose, onSave }) => {
   const OnAiAutoSuggest = () => {
     const sources = Array.from(selectedWords).map((index) => words[index].question);
     setIsAiLoading(true);
-    fetchTranslatedWords(sources, targetLanguage, onTranslationChunkReceived, 2).then((translatedWords) => {
+    fetchTranslatedWords(sources, targetLanguage, onTranslationChunkReceived, chunkSize).then((translatedWords) => {
       setWords((prevWords) => {
         const updatedWords = [...prevWords];
         translatedWords.forEach((translatedWord, _) => {
@@ -278,7 +279,9 @@ export const ConfigModal = ({ isOpen, onClose, onSave }) => {
           </button>
         </div>
         <div>
-          {isAiLoading && <ProgressBar wordsReceived={translatedWords} wordsTotal={wordsTotal} />}
+          {isAiLoading && 
+          wordsTotal > chunkSize &&
+          <ProgressBar wordsReceived={translatedWords} wordsTotal={wordsTotal} />}
         </div>
 
         {/* Words Table */}
