@@ -38,6 +38,8 @@
   },
   "stackblitz": {
     "installDependencies": false,
-    "startCommand": false
+    "startCommand": false,
+    "hideDevtools": true,
+    "openFile": "src/main.jsx"
   } 
 }
