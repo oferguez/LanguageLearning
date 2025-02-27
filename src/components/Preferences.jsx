@@ -13,17 +13,17 @@ function isValidObject(obj) {
     return false;
   }
 
-  if ( typeof obj === "object" ) {
+  if (typeof obj === "object") {
     return Object.keys(obj).length > 0;
   }
 
-  if ( Array.isArray(obj) ) {
+  if (Array.isArray(obj)) {
     return obj.length > 0;
   }
 
   return true;
 }
- 
+
 const loadFromStorage = (key, defaultValue) => {
   try {
     const storedValue = localStorage.getItem(key);
@@ -34,7 +34,7 @@ const loadFromStorage = (key, defaultValue) => {
   }
 };
 
-export const SaveConfig = ({searchWords, steps, words}) => {
+export const SaveConfig = ({ searchWords, steps, words }) => {
   localStorage.setItem("searchWords", JSON.stringify(searchWords));
   localStorage.setItem("steps", JSON.stringify(steps));
   localStorage.setItem("words", JSON.stringify(words));
@@ -68,7 +68,7 @@ export const ConfigModal = ({ isOpen, onClose, onSave }) => {
   const [steps, setSteps] = useState(loadFromStorage("steps", 5));
   const [targetLanguage, setTargetLanguage] = useState("English (UK)");
   const [words, setWords] = useState(loadFromStorage("words", []));
-  
+
   const [selectedWords, setSelectedWords] = useState(new Set());
   const [isAiLoading, setIsAiLoading] = useState(false);
   const [translatedWords, setTranslatedWords] = useState(0);
@@ -79,7 +79,7 @@ export const ConfigModal = ({ isOpen, onClose, onSave }) => {
     const csvFilePath = `${import.meta.env.BASE_URL}words.csv`;
     const data = await fetchCSV(csvFilePath)
       .catch(error => console.error("Error loading CSV:", error));
-    return [...data];  
+    return [...data];
   }
 
   useEffect(() => {
@@ -89,9 +89,9 @@ export const ConfigModal = ({ isOpen, onClose, onSave }) => {
       const data = await fetchCSV(csvFilePath)
         .catch(error => console.error("Error loading CSV:", error));
       if (data.length > 0) {
-        setWords( (prev) => {
-          return [...data];  
-        })   
+        setWords((prev) => {
+          return [...data];
+        })
       }
     }
 
@@ -99,8 +99,8 @@ export const ConfigModal = ({ isOpen, onClose, onSave }) => {
     // if (!isValidObject(words)) {
     //   loadCSV();
     // }
-  }, []); 
-  
+  }, []);
+
   function onTranslationChunkReceived(wordsReceived, wordsTotal) {
     console.log(`Received ${wordsReceived} of ${wordsTotal} words`);
     setTranslatedWords(wordsReceived);
@@ -187,7 +187,7 @@ export const ConfigModal = ({ isOpen, onClose, onSave }) => {
   }
 
   return isOpen && (
-    
+
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
       <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-4xl max-h-[90vh] overflow-y-auto">
         <h2 className="text-2xl font-bold mb-4 text-center">Game Configuration</h2>
@@ -233,31 +233,44 @@ export const ConfigModal = ({ isOpen, onClose, onSave }) => {
           />
         </div>
 
-        {/* Button Row */}
-        <div className="flex items-center space-x-4 mb-4">
-          <button onClick={toggleSelectAll} className="px-3 py-1 bg-blue-500 text-white rounded-md whitespace-nowrap">
-            {selectedWords.size === words.length ? "Deselect All" : "Select All"}
-          </button>
-          <button onClick={addNewWord} className="px-3 py-1 bg-blue-500 text-white rounded-md whitespace-nowrap">
-            + Add Word
-          </button>
-          <button
-            disabled={selectedWords.size === 0}
-            onClick={deleteSelected}
-            className={selectedWords.size === 0 ?
-              "px-3 py-1 bg-gray-400 text-white rounded-md whitespace-nowrap" :
-              "px-3 py-1 bg-blue-500 text-white rounded-md whitespace-nowrap"}>
-            ✖ Delete
-          </button>
-          <div className="flex items-center space-x-2">
-            <label htmlFor="targetLanguage" className="font-semibold whitespace-nowrap" >
+        {/* Button Row - Responsive Layout */}
+        <div className="flex flex-col space-y-3 mb-4 sm:flex-row sm:flex-wrap sm:items-center sm:space-y-0 sm:space-x-2">
+          {/* First Row on Mobile / Left Side on Desktop */}
+          <div className="flex space-x-2">
+            <button
+              onClick={toggleSelectAll}
+              className="px-3 py-1 bg-blue-500 text-white rounded-md text-sm whitespace-nowrap"
+            >
+              {selectedWords.size === words.length ? "Deselect All" : "Select All"}
+            </button>
+
+            <button
+              onClick={addNewWord}
+              className="px-3 py-1 bg-blue-500 text-white rounded-md text-sm whitespace-nowrap"
+            >
+              + Add Word
+            </button>
+
+            <button
+              disabled={selectedWords.size === 0}
+              onClick={deleteSelected}
+              className={`px-3 py-1 text-white rounded-md text-sm whitespace-nowrap ${selectedWords.size === 0 ? "bg-gray-400" : "bg-blue-500"
+                }`}
+            >
+              ✖ Delete
+            </button>
+          </div>
+
+          {/* Second Row on Mobile / Middle on Desktop */}
+          <div className="flex items-center space-x-2 sm:ml-1">
+            <label htmlFor="targetLanguage" className="font-semibold text-sm whitespace-nowrap">
               Target Language:
             </label>
             <select
               id="targetLanguage"
               value={targetLanguage}
               onChange={(e) => setTargetLanguage(e.target.value)}
-              className="px-3 py-1 border rounded-md whitespace-nowrap"
+              className="px-2 py-1 border rounded-md text-sm"
             >
               <option value="English (UK)">English (UK)</option>
               <option value="Hebrew">Hebrew</option>
@@ -269,21 +282,27 @@ export const ConfigModal = ({ isOpen, onClose, onSave }) => {
             </select>
           </div>
 
-          {/* Use AI Button (Justified to Right, Takes Remaining Space) */}
-          <button
-            disabled={selectedWords.size === 0 || isAiLoading}
-            onClick={() => OnAiAutoSuggest()}
-            className={`px-4 py-2 rounded-md text-white ${(isAiLoading || selectedWords.size === 0) ? "bg-gray-400 cursor-not-allowed" : "bg-blue-500 hover:bg-blue-600"}`}
-          >
-            {isAiLoading ? "⏳ Processing..." : "AI Auto Suggest"}
-          </button>
-        </div>
-        <div>
-          {isAiLoading && 
-          wordsTotal > chunkSize &&
-          <ProgressBar wordsReceived={translatedWords} wordsTotal={wordsTotal} />}
+          {/* Third Row on Mobile / Right Side on Desktop */}
+          <div className="sm:ml-auto">
+            <button
+              disabled={selectedWords.size === 0 || isAiLoading}
+              onClick={() => OnAiAutoSuggest()}
+              className={`w-full px-4 py-2 rounded-md text-white text-sm ${(isAiLoading || selectedWords.size === 0)
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-blue-500 hover:bg-blue-600"
+                }`}
+            >
+              {isAiLoading ? "⏳ Processing..." : "AI Auto Suggest"}
+            </button>
+          </div>
         </div>
 
+        {/* Progress Bar - Always Full Width */}
+        <div>
+          {isAiLoading &&
+            wordsTotal > chunkSize &&
+            <ProgressBar wordsReceived={translatedWords} wordsTotal={wordsTotal} />}
+        </div>
         {/* Words Table */}
         <div className="scrollable-table overflow-y-scroll max-h-[300px] border border-gray-400 rounded-md">
           <table className="table-auto w-full border-collapse">
