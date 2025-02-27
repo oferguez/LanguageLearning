@@ -1,6 +1,6 @@
 # Language Learning
 
-[Edit in StackBlitz next generation editor ⚡️](https://stackblitz.com/~/github.com/oferguez/LanguageLearning)
+[Edit in StackBlitz](https://stackblitz.com/~/github.com/oferguez/LanguageLearning)
 
 [Run app here](https://oferguez.github.io/LanguageLearning/)
 
