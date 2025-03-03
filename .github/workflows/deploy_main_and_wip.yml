@@ -1,0 +1,57 @@
+name: Deploy Main & WIP Branches
+
+on:
+  workflow_dispatch:
+    inputs:
+      deploy_main:
+        description: 'Deploy main branch'
+        required: false
+        default: 'true'
+      deploy_wip:
+        description: 'Deploy wip branch'
+        required: false
+        default: 'true'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14'
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Build and deploy main branch
+      if: ${{ github.event.inputs.deploy_main == 'true' }}
+      run: |
+        git fetch origin main
+        git checkout main
+        npm run build
+        mkdir -p ./build/main
+        mv ./build/* ./build/main/
+        cd ./build
+        git init
+        git add .
+        git commit -m 'Deploy main branch'
+        git push --force --quiet "https://${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" HEAD:gh-pages
+
+    - name: Build and deploy wip branch
+      if: ${{ github.event.inputs.deploy_wip == 'true' }}
+      run: |
+        git fetch origin wip
+        git checkout wip
+        npm run build
+        mkdir -p ./build/wip
+        mv ./build/* ./build/wip/
+        cd ./build
+        git init
+        git add .
+        git commit -m 'Deploy wip branch'
+        git push --force --quiet "https://${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" HEAD:gh-pages
