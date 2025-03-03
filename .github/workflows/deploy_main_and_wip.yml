@@ -56,6 +56,8 @@ jobs:
         fi        
 
     - name: Deploy to GitHub Pages
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd ./deploy
         git init
