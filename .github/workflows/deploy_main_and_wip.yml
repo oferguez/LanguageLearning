@@ -27,6 +27,10 @@ jobs:
       with:
         node-version: '16'  # Ensure Node.js version 16 is used
 
+    - name: 🔑 Set Environment Variables
+      run: |
+          echo "VITE_UNSPLASH_API_KEY=${{ secrets.VITE_UNSPLASH_API_KEY }}" >> .env
+
     - name: Install dependencies
       run: npm install
 
@@ -51,15 +55,6 @@ jobs:
         npm run build || exit 1  # Exit if build fails
         mkdir -p ./deploy/wip
         mv ./dist/* ./deploy/wip/ || exit 1  # Exit if mv fails
-
-    - name: Verify GITHUB_TOKEN
-      run: |
-        if [[ -z "${{ secrets.GITHUB_TOKEN }}" ]]; then
-          echo "GITHUB_TOKEN is not set"
-          exit 1
-        else
-          echo "✅ GITHUB_TOKEN exists and is set!"
-        fi
 
     - name: Deploy to GitHub Pages
       env:
