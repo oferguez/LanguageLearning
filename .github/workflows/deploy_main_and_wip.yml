@@ -46,15 +46,6 @@ jobs:
         mkdir -p ./deploy/wip
         mv ./dist/* ./deploy/wip/
 
-    - name: 🛠️ Debug Check GitHub Token
-      run: |
-        if [[ -z "${{ secrets.GITHUB_TOKEN }}" ]]; then
-        echo "❌ GITHUB_TOKEN is NOT set!"
-        exit 1
-        else
-        echo "✅ GITHUB_TOKEN exists and is set!"
-        fi        
-
     - name: Deploy to GitHub Pages
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -65,4 +56,11 @@ jobs:
         git config user.email "github-actions[bot]@users.noreply.github.com"
         git add .
         git commit -m "Deploy to GitHub Pages"
+        echo secrets
+        if [[ -z "${{ secrets.GITHUB_TOKEN }}" ]]; then
+        echo "❌ GITHUB_TOKEN is NOT set!"
+        exit 1
+        else
+        echo "✅ GITHUB_TOKEN exists and is set!"
+        fi        
         git push --force "https://${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" master:gh-pages
