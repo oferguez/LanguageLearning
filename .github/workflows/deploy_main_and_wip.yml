@@ -35,7 +35,7 @@ jobs:
         git checkout main
         npm run build
         mkdir -p ./deploy/main
-        mv ./build/* ./deploy/main/
+        mv ./dist/* ./deploy/main/
 
     - name: Build wip branch
       if: ${{ github.event.inputs.deploy_wip == 'true' }}
@@ -44,7 +44,7 @@ jobs:
         git checkout wip
         npm run build
         mkdir -p ./deploy/wip
-        mv ./build/* ./deploy/wip/
+        mv ./dist/* ./deploy/wip/
 
     - name: Deploy to GitHub Pages
       run: |
