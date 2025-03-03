@@ -19,32 +19,47 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
+      with:
+        persist-credentials: false  # Disable automatic token persistence
 
     - name: Set up Node.js
       uses: actions/setup-node@v2
       with:
-        node-version: '16'
+        node-version: '16'  # Ensure Node.js version 16 is used
 
     - name: Install dependencies
       run: npm install
 
     - name: Build main branch
       if: ${{ github.event.inputs.deploy_main == 'true' }}
+      env:
+        BASE_URL: /LanguageLearning/
       run: |
         git fetch origin main
         git checkout main
-        npm run build
-        mkdir -p ./deploy/main
-        mv ./dist/* ./deploy/main/
+        npm run build || exit 1  # Exit if build fails
+        mkdir -p ./deploy
+        mv ./dist/* ./deploy/ || exit 1  # Exit if mv fails
 
     - name: Build wip branch
       if: ${{ github.event.inputs.deploy_wip == 'true' }}
+      env:
+        BASE_URL: /LanguageLearning/wip/
       run: |
         git fetch origin wip
         git checkout wip
-        npm run build
+        npm run build || exit 1  # Exit if build fails
         mkdir -p ./deploy/wip
-        mv ./dist/* ./deploy/wip/
+        mv ./dist/* ./deploy/wip/ || exit 1  # Exit if mv fails
+
+    - name: Verify GITHUB_TOKEN
+      run: |
+        if [[ -z "${{ secrets.GITHUB_TOKEN }}" ]]; then
+          echo "GITHUB_TOKEN is not set"
+          exit 1
+        else
+          echo "✅ GITHUB_TOKEN exists and is set!"
+        fi
 
     - name: Deploy to GitHub Pages
       env:
@@ -56,11 +71,5 @@ jobs:
         git config user.email "github-actions[bot]@users.noreply.github.com"
         git add .
         git commit -m "Deploy to GitHub Pages"
-        if [[ -z "${{ secrets.GITHUB_TOKEN }}" ]]; then
-        echo "❌ GITHUB_TOKEN is NOT set!"
-        exit 1
-        else
-        echo "✅ GITHUB_TOKEN exists and is set!"
-        fi        
         git remote add origin "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git"
         git push --force origin master:gh-pages
