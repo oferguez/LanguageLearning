@@ -46,6 +46,15 @@ jobs:
         mkdir -p ./deploy/wip
         mv ./dist/* ./deploy/wip/
 
+    - name: 🛠️ Debug Check GitHub Token
+      run: |
+        if [[ -z "${{ secrets.GITHUB_TOKEN }}" ]]; then
+        echo "❌ GITHUB_TOKEN is NOT set!"
+        exit 1
+        else
+        echo "✅ GITHUB_TOKEN exists and is set!"
+        fi        
+
     - name: Deploy to GitHub Pages
       run: |
         cd ./deploy
