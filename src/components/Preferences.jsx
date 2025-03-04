@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import fetchTranslatedWords from "../service/translationAiFetcher.js";
 import ProgressBar from "./ProgressBar.jsx";
 import fetchCSV from '../service/defaultWords.js';
+//import '../Preferences.css';
 
 const chunkSize = 2;
 
@@ -73,6 +74,9 @@ export const ConfigModal = ({ isOpen, onClose, onSave }) => {
   const [isAiLoading, setIsAiLoading] = useState(false);
   const [translatedWords, setTranslatedWords] = useState(0);
   const [wordsTotal, setWordsTotal] = useState(0);
+  const [players, setPlayers] = useState(['Alice', 'Bob', 'Charlie']);
+  const [selectedPlayer, setSelectedPlayer] = useState('');
+  const [newPlayer, setNewPlayer] = useState('');
 
   async function loadCSV() {
 
@@ -186,14 +190,54 @@ export const ConfigModal = ({ isOpen, onClose, onSave }) => {
     });
   }
 
+  const handleAddPlayer = () => {
+    if (newPlayer && !players.includes(newPlayer)) {
+      setPlayers([...players, newPlayer]);
+      setNewPlayer('');
+    }
+  };
+
+  const handleDeletePlayer = (player) => {
+    setPlayers(players.filter(p => p !== player));
+  };
+
   return isOpen && (
 
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
       <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-4xl max-h-[90vh] overflow-y-auto">
         <h2 className="text-2xl font-bold mb-4 text-center">Game Configuration</h2>
 
-        {/* Search Words Section */}
         <div className="mb-4">
+
+          {/* Player Name */}
+          <div className="player-name">
+
+            <div className="player-name flex items-center space-x-2">
+              <label className="font-semibold" htmlFor="player-select">Player Name:</label>
+              <select
+                id="player-select"
+                value={selectedPlayer}
+                onChange={(e) => setSelectedPlayer(e.target.value)}
+                className="border p-2 rounded-md">
+                <option value="" disabled>Select a player</option>
+                {players.map((player, index) => (
+                  <option key={index} value={player}>{player}</option>
+                ))}
+              </select>
+            </div>
+      
+
+            <button className="mt-2 px-3 py-1 bg-blue-500 text-white rounded-md" onClick={() => handleDeletePlayer(selectedPlayer)}>Delete Player</button>
+
+            <button className="mt-2 px-3 py-1 bg-blue-500 text-white rounded-md" onClick={handleAddPlayer}>Add Player</button>
+            <input
+              type="text"
+              value={newPlayer}
+              onChange={(e) => setNewPlayer(e.target.value)}
+              placeholder="Add new player" />
+          </div>
+
+          {/* Search Words Section */}
           <label className="font-semibold block mb-2">Search Words</label>
           {isValidObject(searchWords) && searchWords.map((word, index) => (
             <div key={index} className="flex items-center mb-2">
@@ -288,8 +332,8 @@ export const ConfigModal = ({ isOpen, onClose, onSave }) => {
               disabled={selectedWords.size === 0 || isAiLoading}
               onClick={() => OnAiAutoSuggest()}
               className={`w-full px-4 py-2 rounded-md text-white text-sm ${(isAiLoading || selectedWords.size === 0)
-                  ? "bg-gray-400 cursor-not-allowed"
-                  : "bg-blue-500 hover:bg-blue-600"
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-blue-500 hover:bg-blue-600"
                 }`}
             >
               {isAiLoading ? "⏳ Processing..." : "AI Auto Suggest"}
