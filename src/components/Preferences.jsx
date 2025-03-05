@@ -5,6 +5,8 @@ import fetchCSV from '../service/defaultWords.js';
 import PlayerSelection from "./PlayerSelection.jsx";
 
 const chunkSize = 2;
+const configKey = 'LanguageLearningGameConfig';
+
 
 function isValidObject(obj) {
   if (obj === undefined) {
@@ -25,17 +27,26 @@ function isValidObject(obj) {
   return true;
 }
 
-const loadFromStorage = (key, defaultValue) => {
+const loadFromStorage = (playerName, key, defaultValue) => {
   try {
-    const storedValue = localStorage.getItem(key);
-    return storedValue ? JSON.parse(storedValue) : defaultValue;
+    const storedValue = localStorage.getItem(configKey);
+    if (storedValue === null) {
+      return defaultValue;
+    }
+    return (JSON.parse(storedValue))[playerName][key] ?? defaultValue;
   } catch (error) {
-    console.error(`Error loading from storage: ${key}`, error);
+    console.error(`Error loading from storage: ${playerName} ${key}`, error);
     return defaultValue;
   }
 };
 
-export const SaveConfig = ({ searchWords, steps, words }) => {
+export const SaveConfig = ({playerName, searchWords, steps, words }) => {
+  const searchWordsConfig = loadFromStorage(playerName, "searchWords", {});
+  const stepsConfig = loadFromStorage(playerName, "steps", {});
+  const wordsConfig = loadFromStorage(playerName, "words", {});
+  
+
+
   localStorage.setItem("searchWords", JSON.stringify(searchWords));
   localStorage.setItem("steps", JSON.stringify(steps));
   localStorage.setItem("words", JSON.stringify(words));
@@ -187,7 +198,7 @@ export const ConfigModal = ({ isOpen, onClose, onSave }) => {
         
         {/* Search Words Section */}
         <div className="border border-gray-400 p-4 rounded-md mt-4">
-          <label className="font-semibold block mb-2">Search Words for {playerName}</label>
+          <label className="font-semibold block mb-2">Search Words</label>
           {isValidObject(searchWords) && searchWords.map((word, index) => (
             <div key={index} className="flex items-center mb-2">
               <input
@@ -326,7 +337,7 @@ export const ConfigModal = ({ isOpen, onClose, onSave }) => {
           {/* Save and Cancel Buttons */}
           <div className="flex justify-end space-x-4 mt-4">
             <button onClick={onClose} className="px-4 py-2 bg-gray-400 text-white rounded-md hover:bg-gray-500">Cancel</button>
-            <button onClick={() => onSave({ searchWords, steps, words })} className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600">Save</button>
+            <button onClick={() => onSave({ playerName, searchWords, steps, words })} className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600">Save</button>
           </div>
         </div>
       </div>
