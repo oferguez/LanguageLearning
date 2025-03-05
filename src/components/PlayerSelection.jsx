@@ -1,40 +1,43 @@
 import React, { useState, useEffect } from "react";
 
-const PlayerSelection2 = () => {
-  const [players, setPlayers] = useState(['Alice', 'Bob', 'Charlie']);
-  const [selectedPlayer, setSelectedPlayer] = useState({playerName: '', isNewPlayer: false});
+const PlayerSelection = ({selectedPlayerName}) => {
+  const [players, setPlayers] = useState(['Shira', 'Adam']);
+  const [selectedPlayer, setSelectedPlayer] = useState({selectedPlayer: players.length > 0 ? players[0] : '', isNewPlayer: false}); 
+
+  function setSelectedPlayerWorkaround (player, isNewPlayer=false) {
+    console.log("Setting selected player: ", player, isNewPlayer);
+    document.getElementById("player-select").value = player; // Manually workaround to datalist oddities 
+    setSelectedPlayer((prev) => {return {playerName: player, isNewPlayer: isNewPlayer}});
+  }
 
   const handleAddPlayer = () => {
     const newPlayer = selectedPlayer?.playerName;
     if (newPlayer && !players.includes(newPlayer)) {
       setPlayers([...players, newPlayer]);
+      setSelectedPlayerWorkaround(newPlayer, false);
     }
   };
 
   const handleDeletePlayer = () => {
     if (selectedPlayer && !selectedPlayer.isNewPlayer) {
       setPlayers(players.filter((player) => player !== selectedPlayer.playerName));
+      setSelectedPlayerWorkaround(players.length > 0 ? players[0] : ''  , false);
     }
   }  
 
   const handlePlayerChange = (e) => {
-    const value = e.target.value;
-    setSelectedPlayer({playerName: value, isNewPlayer: !players.includes(value)});
+    const playerName = e.target.value;
+    setSelectedPlayerWorkaround(playerName, !players.includes(playerName));
+  };
+
+  const handleMouseDown = (e) => {
+    setSelectedPlayerWorkaround('', false);
   };
 
   useEffect(() => {
-    console.log("New player list: ", players);
-    const player = players[0] || "N/A";
-    document.getElementById("player-select").value = player; // Manually clear input
-    setSelectedPlayer(() => {
-      return {playerName: player, isNewPlayer: false}
-    });
-  }, [players]);
-
-  const handleMouseDown = (e) => {
-    document.getElementById("player-select").value = ""; // Manually clear input
-    setSelectedPlayer(""); // Still update React state
-  };
+    console.log("useEff", selectedPlayerName);
+    setSelectedPlayerWorkaround(selectedPlayerName, false);
+  }, []);
 
   return (
     <div className="border border-gray-400 p-4 rounded-md mt-4">
@@ -43,7 +46,7 @@ const PlayerSelection2 = () => {
         <input
           list="players-list"
           id="player-select"
-          Value={selectedPlayer.playerName}
+          value={selectedPlayer?.playerName ?? "SP is N/A"}
           onChange={handlePlayerChange}
           onMouseDown={handleMouseDown} 
           className="border border-gray-400 rounded-md pl-2"
@@ -62,4 +65,4 @@ const PlayerSelection2 = () => {
   );
 };
 
-export default PlayerSelection2;
+export default PlayerSelection;

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import fetchTranslatedWords from "../service/translationAiFetcher.js";
 import ProgressBar from "./ProgressBar.jsx";
 import fetchCSV from '../service/defaultWords.js';
-//import '../Preferences.css';
+import PlayerSelection from "./PlayerSelection.jsx";
 
 const chunkSize = 2;
 
@@ -197,21 +197,21 @@ export const ConfigModal = ({ isOpen, onClose, onSave }) => {
     });
   }
 
-  const handleAddPlayer = () => {
-    if (newPlayer && !players.includes(newPlayer)) {
-      setPlayers([...players, newPlayer]);
-      setNewPlayer('');
-      alert(`User ${newPlayer} added`);
-    }
-  };
+  // const handleAddPlayer = () => {
+  //   if (newPlayer && !players.includes(newPlayer)) {
+  //     setPlayers([...players, newPlayer]);
+  //     setNewPlayer('');
+  //     alert(`User ${newPlayer} added`);
+  //   }
+  // };
 
-  const handlePlayerChange = (e) => {
-    const value = e.target.value;
-    setSelectedPlayer(value);
-    // if (players.includes(value)) {
-    //   setSelectedPlayer(value);
-    // }
-  };
+  // const handlePlayerChange = (e) => {
+  //   const value = e.target.value;
+  //   setSelectedPlayer(value);
+  //   // if (players.includes(value)) {
+  //   //   setSelectedPlayer(value);
+  //   // }
+  // };
 
   // const handleAddPlayer = () => {
   //   if (newPlayer && !players.includes(newPlayer)) {
@@ -220,16 +220,16 @@ export const ConfigModal = ({ isOpen, onClose, onSave }) => {
   //   }
   // };
 
-  const handleDeletePlayer = (player) => {
-    setPlayers(players.filter(p => p !== player));
-  };
+  // const handleDeletePlayer = (player) => {
+  //   setPlayers(players.filter(p => p !== player));
+  // };
 
-  const handlePlayerBlur = () => {
-    if (selectedPlayer && !players.includes(selectedPlayer)) {
-      setPlayers([...players, selectedPlayer]);
-      alert(`User ${selectedPlayer} added`);
-    }
-  };
+  // const handlePlayerBlur = () => {
+  //   if (selectedPlayer && !players.includes(selectedPlayer)) {
+  //     setPlayers([...players, selectedPlayer]);
+  //     alert(`User ${selectedPlayer} added`);
+  //   }
+  // };
 
 
   return isOpen && (
@@ -238,48 +238,9 @@ export const ConfigModal = ({ isOpen, onClose, onSave }) => {
       <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-4xl max-h-[90vh] overflow-y-auto">
         <h2 className="text-2xl font-bold mb-4 text-center">Game Configuration</h2>
 
-        {/* Player Name */}
-        <div className="border border-gray-400 p-4 rounded-md mt-4">
-          <div className="flex items-center space-x-2 mb-4">
-            <label htmlFor="player-select">Player Name:</label>
-            {/* <datalist id="players-list">
-              {players.map((player, index) => (
-                <option key={index} value={player}>{player}</option>
-              ))}
-            </datalist> */}
-            <datalist id="players-list">
-            <option value="Alice">Alice</option>
-            <option value="Bob">Bob</option>
-            <option value="Rick">Rick</option>
-            </datalist>
-
-            <input
-              list="players-list"
-              id="player-select"
-              value={selectedPlayer}
-              onChange={handlePlayerChange}
-              onBlur={handlePlayerBlur}
-              className="border p-2 rounded-md"
-            />
-            <button className="px-3 py-1 bg-blue-500 text-white rounded-md" onClick={handleAddPlayer}>Add Player</button>
-            <button className="px-3 py-1 bg-blue-500 text-white rounded-md" onClick={() => handleDeletePlayer(selectedPlayer)}>Delete Player</button>
-          </div>
-
-          {/*
-      <div className="flex items-center space-x-2">
-        <button className="px-3 py-1 bg-blue-500 text-white rounded-md" onClick={() => handleDeletePlayer(selectedPlayer)}>Delete Player</button>
-        <input
-          type="text"
-          value={newPlayer}
-          onChange={(e) => setNewPlayer(e.target.value)}
-          placeholder="New player name"
-          className="px-3 py-1 border rounded-md"
-        />
-        <button className="px-3 py-1 bg-blue-500 text-white rounded-md" onClick={handleAddPlayer}>Add Player</button>
-      </div>
-      */}
-        </div>
-
+        {/* Player Selection */}
+        <PlayerSelection selectedPlayerName="Shira" />
+        
         {/* Search Words Section */}
         <div className="border border-gray-400 p-4 rounded-md mt-4">
           <label className="font-semibold block mb-2">Search Words</label>
