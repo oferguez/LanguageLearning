@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
 
-const PlayerSelection = ({selectedPlayerName}) => {
+const PlayerSelection = ({selectedPlayerName, updateSelectedPlayerName}) => {
   const [players, setPlayers] = useState(['Shira', 'Adam']);
   const [selectedPlayer, setSelectedPlayer] = useState({selectedPlayer: players.length > 0 ? players[0] : '', isNewPlayer: false}); 
 
   function setSelectedPlayerWorkaround (player, isNewPlayer=false) {
-    console.log("Setting selected player: ", player, isNewPlayer);
     document.getElementById("player-select").value = player; // Manually workaround to datalist oddities 
     setSelectedPlayer((prev) => {return {playerName: player, isNewPlayer: isNewPlayer}});
+    updateSelectedPlayerName(player);
   }
 
   const handleAddPlayer = () => {

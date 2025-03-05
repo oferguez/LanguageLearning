@@ -74,17 +74,7 @@ export const ConfigModal = ({ isOpen, onClose, onSave }) => {
   const [isAiLoading, setIsAiLoading] = useState(false);
   const [translatedWords, setTranslatedWords] = useState(0);
   const [wordsTotal, setWordsTotal] = useState(0);
-  const [players, setPlayers] = useState(['Alice', 'Bob', 'Charlie']);
-  const [selectedPlayer, setSelectedPlayer] = useState('');
-  const [newPlayer, setNewPlayer] = useState('');
-
-  // async function loadCSV() {
-
-  //   const csvFilePath = `${import.meta.env.BASE_URL}words.csv`;
-  //   const data = await fetchCSV(csvFilePath)
-  //     .catch(error => console.error("Error loading CSV:", error));
-  //   return [...data];
-  // }
+  const [playerName, setPlayerName] = useState('Shira');
 
   useEffect(() => {
     async function iLoadCSV() {
@@ -100,16 +90,6 @@ export const ConfigModal = ({ isOpen, onClose, onSave }) => {
     }
 
     iLoadCSV();
-    // if (!isValidObject(words)) {
-    //   loadCSV();
-    // }
-  }, []);
-
-  useEffect(() => {
-    console.log('useEffect: selectedPlayer');
-    console.dir(players);
-    // setSelectedPlayer(players[0]);
-    console.dir(players);
   }, []);
 
   function onTranslationChunkReceived(wordsReceived, wordsTotal) {
@@ -117,7 +97,6 @@ export const ConfigModal = ({ isOpen, onClose, onSave }) => {
     setTranslatedWords(wordsReceived);
     setWordsTotal(wordsTotal);
   }
-
 
   const toggleSelectAll = () => {
     if (selectedWords.size === words.length) {
@@ -197,41 +176,6 @@ export const ConfigModal = ({ isOpen, onClose, onSave }) => {
     });
   }
 
-  // const handleAddPlayer = () => {
-  //   if (newPlayer && !players.includes(newPlayer)) {
-  //     setPlayers([...players, newPlayer]);
-  //     setNewPlayer('');
-  //     alert(`User ${newPlayer} added`);
-  //   }
-  // };
-
-  // const handlePlayerChange = (e) => {
-  //   const value = e.target.value;
-  //   setSelectedPlayer(value);
-  //   // if (players.includes(value)) {
-  //   //   setSelectedPlayer(value);
-  //   // }
-  // };
-
-  // const handleAddPlayer = () => {
-  //   if (newPlayer && !players.includes(newPlayer)) {
-  //     setPlayers([...players, newPlayer]);
-  //     setNewPlayer('');
-  //   }
-  // };
-
-  // const handleDeletePlayer = (player) => {
-  //   setPlayers(players.filter(p => p !== player));
-  // };
-
-  // const handlePlayerBlur = () => {
-  //   if (selectedPlayer && !players.includes(selectedPlayer)) {
-  //     setPlayers([...players, selectedPlayer]);
-  //     alert(`User ${selectedPlayer} added`);
-  //   }
-  // };
-
-
   return isOpen && (
 
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
@@ -239,11 +183,11 @@ export const ConfigModal = ({ isOpen, onClose, onSave }) => {
         <h2 className="text-2xl font-bold mb-4 text-center">Game Configuration</h2>
 
         {/* Player Selection */}
-        <PlayerSelection selectedPlayerName="Shira" />
+        <PlayerSelection selectedPlayerName={playerName} updateSelectedPlayerName={setPlayerName} />
         
         {/* Search Words Section */}
         <div className="border border-gray-400 p-4 rounded-md mt-4">
-          <label className="font-semibold block mb-2">Search Words</label>
+          <label className="font-semibold block mb-2">Search Words for {playerName}</label>
           {isValidObject(searchWords) && searchWords.map((word, index) => (
             <div key={index} className="flex items-center mb-2">
               <input
