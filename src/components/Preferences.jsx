@@ -2,13 +2,14 @@ import React, { useState, useEffect } from "react";
 import fetchTranslatedWords from "../service/translationAiFetcher.js";
 import ProgressBar from "./ProgressBar.jsx";
 import fetchCSV from '../service/defaultWords.js';
-import PlayerSelection from "./PlayerSelection.jsx";
+import ConfigManager from "../service/configManager.js";
 
 const chunkSize = 2;
 const configKey = 'LanguageLearningGameConfig';
+const configManager = new ConfigManager();
 
 
-function isValidObject(obj) {
+export function isValidObject(obj) {
   if (obj === undefined) {
     return false;
   }
@@ -27,32 +28,37 @@ function isValidObject(obj) {
   return true;
 }
 
-const loadFromStorage = (playerName, key, defaultValue) => {
-  try {
-    const storedValue = localStorage.getItem(configKey);
-    if (storedValue === null) {
-      return defaultValue;
-    }
-    return (JSON.parse(storedValue))[playerName][key] ?? defaultValue;
-  } catch (error) {
-    console.error(`Error loading from storage: ${playerName} ${key}`, error);
-    return defaultValue;
-  }
-};
-
-export const SaveConfig = ({playerName, searchWords, steps, words }) => {
-  const searchWordsConfig = loadFromStorage(playerName, "searchWords", {});
-  const stepsConfig = loadFromStorage(playerName, "steps", {});
-  const wordsConfig = loadFromStorage(playerName, "words", {});
-  
-
-
-  localStorage.setItem("searchWords", JSON.stringify(searchWords));
-  localStorage.setItem("steps", JSON.stringify(steps));
-  localStorage.setItem("words", JSON.stringify(words));
+export const SaveConfig = ({ playerName, searchWords, steps, words }) => {
+  configManager.setItem(playerName, "searchWords", JSON.stringify(searchWords));
+  configManager.setItem(playerName, "steps", JSON.stringify(steps));
+  configManager.setItem(playerName, "words", JSON.stringify(words));
 }
 
-export const RetrieveConfig = () => {
+export const RetrieveConfig = (playerName) => {
+  console.log('RetrieveConfigAsync called');
+
+  async function loadCsvAsync() {
+    const csvFilePath = `${import.meta.env.BASE_URL}words.csv`;
+    const data = await fetchCSV(csvFilePath)
+      .catch(error => console.error("Error loading CSV:", error));
+    console.log(`fetched ${data.length} words from ${csvFilePath}`)
+    return [...data];
+  }
+
+  return loadCsvAsync().then(words => { // Handle promise with .then()
+    let r = {
+      searchWords: configManager.getItem(playerName, "searchWords", ["unicorn"]),
+      steps: configManager.getItem(playerName, "steps", 5),
+      words: configManager.getItem(playerName, "words", words) // Now words is resolved
+    };
+    console.log(`RetrieveConfigAsync: user: ${playerName} loadCsvAsync & load from local storage completed`);
+    console.dir(r);
+    return r;
+  });
+};
+
+
+export const RetrieveConfig_0 = () => {
   console.log('RetrieveConfigAsync called');
 
   async function loadCsvAsync() {
@@ -75,17 +81,16 @@ export const RetrieveConfig = () => {
   });
 };
 
-export const ConfigModal = ({ isOpen, onClose, onSave }) => {
-  const [searchWords, setSearchWords] = useState(loadFromStorage("searchWords", ["unicorn"]));
-  const [steps, setSteps] = useState(loadFromStorage("steps", 5));
+export const ConfigModal = ({ isOpen, onClose, onSave, config }) => {
   const [targetLanguage, setTargetLanguage] = useState("English (UK)");
-  const [words, setWords] = useState(loadFromStorage("words", []));
+  const [searchWords, setSearchWords] = useState(config.searchWords);
+  const [steps, setSteps] = useState(config.steps);
+  const [words, setWords] = useState(config.words);
 
   const [selectedWords, setSelectedWords] = useState(new Set());
   const [isAiLoading, setIsAiLoading] = useState(false);
   const [translatedWords, setTranslatedWords] = useState(0);
   const [wordsTotal, setWordsTotal] = useState(0);
-  const [playerName, setPlayerName] = useState('Shira');
 
   useEffect(() => {
     async function iLoadCSV() {
@@ -192,9 +197,6 @@ export const ConfigModal = ({ isOpen, onClose, onSave }) => {
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
       <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-4xl max-h-[90vh] overflow-y-auto">
         <h2 className="text-2xl font-bold mb-4 text-center">Game Configuration</h2>
-
-        {/* Player Selection */}
-        <PlayerSelection selectedPlayerName={playerName} updateSelectedPlayerName={setPlayerName} />
         
         {/* Search Words Section */}
         <div className="border border-gray-400 p-4 rounded-md mt-4">

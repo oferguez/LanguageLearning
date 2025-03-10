@@ -1,68 +1,123 @@
 import React, { useState, useEffect } from "react";
+import { isValidObject } from "./Preferences";
 
-const PlayerSelection = ({selectedPlayerName, updateSelectedPlayerName}) => {
+export const getCurrentUser = () => 'Shira'
+
+export const PlayerSelection = ({className, selectedPlayerName, updateSelectedPlayerName}) => {
   const [players, setPlayers] = useState(['Shira', 'Adam']);
-  const [selectedPlayer, setSelectedPlayer] = useState({selectedPlayer: players.length > 0 ? players[0] : '', isNewPlayer: false}); 
+  const [selectedPlayer, setSelectedPlayer] = useState(selectedPlayerName); 
 
-  function setSelectedPlayerWorkaround (player, isNewPlayer=false) {
+  console.log('PS invoked')
+
+  useEffect(() => {
+    console.log(`ue1: PlayerSelection: selected=[${selectedPlayerName}] players=[${players}]`);
+  }, []);
+
+  useEffect(() => {
+    console.log("ue2: ", selectedPlayerName);
+    setSelectedPlayerWorkaround(selectedPlayerName, false);
+  }, []);
+
+
+  function setSelectedPlayerWorkaround (player) {
     document.getElementById("player-select").value = player; // Manually workaround to datalist oddities 
-    setSelectedPlayer((prev) => {return {playerName: player, isNewPlayer: isNewPlayer}});
+    setSelectedPlayer(player);
     updateSelectedPlayerName(player);
   }
 
   const handleAddPlayer = () => {
-    const newPlayer = selectedPlayer?.playerName;
+    const newPlayer = selectedPlayer;
     if (newPlayer && !players.includes(newPlayer)) {
       setPlayers([...players, newPlayer]);
-      setSelectedPlayerWorkaround(newPlayer, false);
+      setSelectedPlayerWorkaround(newPlayer);
     }
   };
 
   const handleDeletePlayer = () => {
-    if (selectedPlayer && !selectedPlayer.isNewPlayer) {
-      setPlayers(players.filter((player) => player !== selectedPlayer.playerName));
-      setSelectedPlayerWorkaround(players.length > 0 ? players[0] : ''  , false);
+    if (selectedPlayer && players.includes(selectedPlayer)) {
+      setPlayers(players.filter((player) => player !== selectedPlayer));
+      setSelectedPlayerWorkaround(players.length > 0 ? players[0] : '');
     }
   }  
 
   const handlePlayerChange = (e) => {
     const playerName = e.target.value;
-    setSelectedPlayerWorkaround(playerName, !players.includes(playerName));
+    setSelectedPlayerWorkaround(playerName);
   };
 
   const handleMouseDown = (e) => {
     setSelectedPlayerWorkaround('', false);
   };
 
-  useEffect(() => {
-    console.log("useEff", selectedPlayerName);
-    setSelectedPlayerWorkaround(selectedPlayerName, false);
-  }, []);
-
   return (
-    <div className="border border-gray-400 p-4 rounded-md mt-4">
-      <div className="flex items-center space-x-2 mb-4">
-        <label htmlFor="player-select">Player Name:</label>
-        <input
+    <div className={`w-80 md:w-96 lg:w-[40rem] ${className}`}> {/* Set fixed width */}
+        <label className="flex items-center justify-center" htmlFor="player-select">Player Name:</label>
+        <input className="ml-4 pl-4 text-black border border-gray-300 
+            hover:border-4 hover:border-green-500 focus:border-4 
+            focus:border-blue-500 transition-all
+            w-40 md:w-60 lg:w-72"
           list="players-list"
           id="player-select"
-          value={selectedPlayer?.playerName ?? "SP is N/A"}
+          style={{ width: "10rem" }}
+          value= {isValidObject(selectedPlayer) ? selectedPlayer : "SP is N/A"}
           onChange={handlePlayerChange}
           onMouseDown={handleMouseDown} 
-          className="border border-gray-400 rounded-md pl-2"
         />
         <datalist id="players-list">
           {players.map((player, index) => (
             <option key={index} value={player}>{player}</option>
           ))}
         </datalist>
-        {selectedPlayer.playerName && selectedPlayer.isNewPlayer &&
-        <button className="px-3 py-1 bg-blue-500 text-white rounded-md" onClick={handleAddPlayer}>Add Player</button>}
-        {selectedPlayer.playerName && !selectedPlayer.isNewPlayer &&
-        <button className="px-3 py-1 bg-blue-500 text-white rounded-md" onClick={handleDeletePlayer}>Delete Player</button>}
+
+        <div className="
+        
+        w-80 md:w-96 lg:w-[rem]
+
+        ml-4 min-w-[8rem] w-full max-w-[12rem]">
+          {isValidObject(selectedPlayer) && !players.includes(selectedPlayer) && (
+            <button  
+              className="w-full px-4 py-2 bg-red-500 text-white rounded-md shadow-md hover:shadow-lg transition-all" 
+              onClick={handleAddPlayer}
+            >
+              Add Player
+            </button>
+          )}
+
+          {isValidObject(selectedPlayer) && players.includes(selectedPlayer) && (
+            <button  
+              className="w-full px-4 py-2 bg-red-500 text-white rounded-md shadow-md hover:shadow-lg transition-all" 
+              onClick={handleDeletePlayer}
+            >
+              Delete Player
+            </button>
+          )}
       </div>
+
+
     </div>
+
   );
 };
 
-export default PlayerSelection;
+/*
+<div className="ml-4 min-w-[8rem] w-full max-w-[12rem]">
+  {isValidObject(selectedPlayer) && !players.includes(selectedPlayer) && (
+    <button  
+      className="w-full px-4 py-2 bg-red-500 text-white rounded-md shadow-md hover:shadow-lg transition-all" 
+      onClick={handleAddPlayer}
+    >
+      Add Player
+    </button>
+  )}
+
+  {isValidObject(selectedPlayer) && players.includes(selectedPlayer) && (
+    <button  
+      className="w-full px-4 py-2 bg-red-500 text-white rounded-md shadow-md hover:shadow-lg transition-all" 
+      onClick={handleDeletePlayer}
+    >
+      Delete Player
+    </button>
+  )}
+</div>
+
+*/
